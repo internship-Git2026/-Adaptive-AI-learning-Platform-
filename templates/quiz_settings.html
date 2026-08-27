@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Quiz Settings</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='quiz_settings.css') }}">
+
+</head>
+
+<body>
+
+<div class="settings-container">
+
+    <div class="settings-card">
+
+        <div class="header">
+
+            <i class="fas fa-sliders-h"></i>
+
+            <h1>Quiz Settings</h1>
+
+            <p>
+                Configure your AI Quiz before generation.
+            </p>
+
+        </div>
+
+        <form
+            action="{{ url_for('ai_quiz.generate_quiz', pdf_id=pdf_id) }}"
+            method="POST"
+            id="quiz-settings-form">
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Question Count -->
+
+            <div class="setting-block">
+
+                <h3>Number of Questions</h3>
+
+                <div class="options">
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="question_count"
+                            value="10"
+                            checked>
+
+                        <span>10 Questions</span>
+
+                    </label>
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="question_count"
+                            value="20">
+
+                        <span>20 Questions</span>
+
+                    </label>
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="question_count"
+                            value="30">
+
+                        <span>30 Questions</span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <!-- Timer -->
+
+            <div class="setting-block">
+
+                <h3>Quiz Duration</h3>
+
+                <div class="options">
+
+                    <label>
+                        <input type="radio" name="duration" value="10">
+                        <span>10 Min</span>
+                    </label>
+
+                    <label>
+                        <input type="radio" name="duration" value="20" checked>
+                        <span>20 Min</span>
+                    </label>
+
+                    <label>
+                        <input type="radio" name="duration" value="30">
+                        <span>30 Min</span>
+                    </label>
+
+                    <label>
+                        <input type="radio" name="duration" value="45">
+                        <span>45 Min</span>
+                    </label>
+
+                    <label>
+                        <input type="radio" name="duration" value="60">
+                        <span>60 Min</span>
+                    </label>
+
+                </div>
+
+            </div>
+
+            <!-- Difficulty -->
+
+            <div class="setting-block">
+
+                <h3>Difficulty</h3>
+
+                <div class="options">
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="difficulty"
+                            value="Easy">
+
+                        <span>Easy</span>
+
+                    </label>
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="difficulty"
+                            value="Medium"
+                            checked>
+
+                        <span>Medium</span>
+
+                    </label>
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="difficulty"
+                            value="Hard">
+
+                        <span>Hard</span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <button
+                type="submit"
+                class="generate-btn"
+                id="generate-btn">
+
+                <i class="fas fa-robot"></i>
+
+                Generate AI Quiz
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+    // Prevent double-clicks from firing multiple quiz-generation requests and
+    // show a clear loading state while Gemini builds the quiz.
+    const quizForm = document.getElementById('quiz-settings-form');
+    if (quizForm) {
+        quizForm.addEventListener('submit', () => {
+            const button = document.getElementById('generate-btn');
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating AI Quiz...';
+            }
+        });
+    }
+</script>
+
+</body>
+
+</html>

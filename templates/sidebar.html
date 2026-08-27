@@ -1,0 +1,55 @@
+<!-- Sidebar Component -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<header class="mobile-header">
+  <div class="mobile-brand">
+    <i class="fas fa-brain"></i>
+    <span>Adaptive Learning</span>
+  </div>
+  <button class="sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+</header>
+
+<aside class="app-sidebar" id="appSidebar">
+  <div class="sidebar-brand">
+    <i class="fas fa-brain"></i>
+    <span>Adaptive Learning</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a href="{{ url_for('dashboard.dashboard_page') }}" class="sidebar-link {% if active_page == 'dashboard' %}active{% endif %}">
+      <i class="fas fa-chart-pie"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{{ url_for('doubt_solver.solver_page') }}" class="sidebar-link {% if active_page == 'doubt_solver' %}active{% endif %}">
+      <i class="fas fa-question-circle"></i>
+      <span>AI Doubt Solver</span>
+    </a>
+    <a href="{{ url_for('my_courses.my_courses_page') }}" class="sidebar-link {% if active_page == 'courses' %}active{% endif %}">
+      <i class="fas fa-book-open"></i>
+      <span>My Courses</span>
+    </a>
+    <a href="{{ url_for('progress.progress_page') }}" class="sidebar-link {% if active_page == 'progress' %}active{% endif %}">
+      <i class="fas fa-chart-line"></i>
+      <span>Progress</span>
+    </a>
+    <a href="{{ url_for('notification.notifications_page') }}"
+   class="sidebar-link {% if active_page == 'notifications' %}active{% endif %}">
+
+    <i class="fas fa-bell"></i>
+
+    <span>Notifications</span>
+    {% if unread_notifications_count > 0 %}
+    <span style="background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; margin-left: auto;">{{ unread_notifications_count }}</span>
+    {% endif %}
+
+</a>
+    <a href="{{ url_for('profile.profile_page') }}" class="sidebar-link {% if active_page == 'profile' %}active{% endif %}">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+  </div>
+</aside>
+

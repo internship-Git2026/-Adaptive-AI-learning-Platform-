@@ -1,0 +1,198 @@
+/* ===============================
+   RESULT PAGE
+================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f5f7fb;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px;
+}
+
+.result-container{
+    width:100%;
+    max-width:1100px;
+    background:#fff;
+    border-radius:20px;
+    padding:40px;
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+}
+
+/* ================= HEADER ================= */
+
+.result-header{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.success-icon{
+    width:80px;
+    height:80px;
+    margin:auto;
+    background:#e8f5e9;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:40px;
+    color:#28a745;
+    margin-bottom:15px;
+}
+
+.result-header h1{
+    color:#2f66e9;
+    margin-bottom:10px;
+}
+
+.result-header p{
+    color:#666;
+}
+
+/* ================= STATS ================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    margin-bottom:35px;
+}
+
+.result-card{
+    background:#fff;
+    border:1px solid #e7eaf3;
+    border-radius:18px;
+    padding:25px;
+    text-align:center;
+    transition:.3s;
+}
+
+.result-card:hover{
+    transform:translateY(-5px);
+}
+
+.result-card i{
+    font-size:30px;
+    color:#2f66e9;
+    margin-bottom:15px;
+}
+
+.result-card h2{
+    font-size:32px;
+    color:#111827;
+    margin-bottom:10px;
+}
+
+.result-card span{
+    color:#64748b;
+}
+
+/* ================= PERFORMANCE ================= */
+
+.performance-card,
+.recommend-card,
+.achievement-card{
+    background:#fff;
+    border:1px solid #e7eaf3;
+    border-radius:18px;
+    padding:25px;
+    margin-bottom:25px;
+}
+
+.performance-card h2,
+.recommend-card h2,
+.achievement-card h2{
+    margin-bottom:20px;
+}
+
+.progress-bar{
+    height:12px;
+    background:#e5e7eb;
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.progress-fill{
+    height:100%;
+    background:#2f66e9;
+    border-radius:20px;
+}
+
+.excellent{color:#16a34a;}
+.good{color:#2563eb;}
+.average{color:#f59e0b;}
+.poor{color:#dc2626;}
+
+/* ================= RECOMMEND ================= */
+
+.recommend-card ul{
+    padding-left:20px;
+}
+
+.recommend-card li{
+    margin-bottom:12px;
+    color:#475569;
+}
+
+/* ================= ACHIEVEMENT ================= */
+
+.achievement-list{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+/* ================= BUTTONS ================= */
+
+.button-group{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    margin-top:35px;
+}
+
+.submit-btn{
+    background:#2f66e9;
+    color:white;
+    text-decoration:none;
+    padding:14px 30px;
+    border-radius:12px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.submit-btn:hover{
+    transform:translateY(-3px);
+    background:#1d4ed8;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+
+.stats-grid{
+grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+@media(max-width:650px){
+
+.stats-grid{
+grid-template-columns:1fr;
+}
+
+.button-group{
+flex-direction:column;
+}
+
+}

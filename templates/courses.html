@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Available Courses · AdaptiveAI Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='courses.css') }}" />
+</head>
+<body>
+
+  <div class="dashboard-container">
+
+    <!-- ===== TOP NAVBAR ===== -->
+    <nav class="dashboard-nav">
+      <div class="nav-left">
+        <div class="logo">
+          <i class="fas fa-brain" style="color: #2563eb;"></i>
+          <span>AdaptiveAI Platform</span>
+        </div>
+      </div>
+      <div class="nav-center">
+        <a href="{{ url_for('dashboard.dashboard_page') }}" class="nav-link">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="{{ url_for('my_courses.my_courses_page') }}" class="nav-link">
+          <i class="fas fa-book-open"></i> My Courses
+        </a>
+        <a href="{{ url_for('profile.profile_page') }}" class="nav-link">
+          <i class="fas fa-user"></i> Profile
+        </a>
+      </div>
+      <div class="nav-right">
+        <a href="{{ url_for('main.logout') }}" class="logout-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </a>
+      </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}" style="padding: 1rem; margin-top: 1rem; border-radius: 8px; background-color: #fef3c7; color: #d97706; font-weight: 500; border-left: 4px solid #f59e0b;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- ===== WELCOME SECTION ===== -->
+    <div class="welcome-section" style="margin-bottom: 2rem;">
+      <div class="welcome-text">
+        <h1>All Syllabus Programs</h1>
+        <p>Enroll in a course track to activate your quizzes and progress metrics.</p>
+      </div>
+    </div>
+
+    <!-- ===== AVAILABLE COURSES LIST ===== -->
+    <div class="courses-section">
+      <div class="course-grid">
+
+        <!-- GATE -->
+        <div class="course-card">
+          <div class="course-image">
+            <i class="fas fa-microchip"></i>
+          </div>
+          <div class="course-content">
+            <h3>GATE Preparation</h3>
+            <p>AI-powered preparation for Graduate Aptitude Test in Engineering.</p>
+            {% if 'GATE' in purchased_courses or 'GATE+NEET' in purchased_courses %}
+              <a href="{{ url_for('my_courses.my_courses_page') }}" class="course-btn" style="text-decoration: none; display: block; width: 100%; text-align: center; margin-top: 1.5rem;">
+                Go to Course <i class="fas fa-chevron-right"></i>
+              </a>
+            {% else %}
+              <form action="{{ url_for('courses.enroll_course_submit') }}" method="POST" style="margin-top: 1.5rem;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="selected_course" value="GATE">
+                <button type="submit" class="course-btn" style="border: none; cursor: pointer; width: 100%;">
+                  Enroll & Pay <i class="fas fa-chevron-right"></i>
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- NEET -->
+        <div class="course-card">
+          <div class="course-image neet">
+            <i class="fas fa-stethoscope"></i>
+          </div>
+          <div class="course-content">
+            <h3>NEET Preparation</h3>
+            <p>Practice Biology, Physics and Chemistry with adaptive quizzes.</p>
+            {% if 'NEET' in purchased_courses or 'GATE+NEET' in purchased_courses %}
+              <a href="{{ url_for('my_courses.my_courses_page') }}" class="course-btn" style="text-decoration: none; display: block; width: 100%; text-align: center; margin-top: 1.5rem;">
+                Go to Course <i class="fas fa-chevron-right"></i>
+              </a>
+            {% else %}
+              <form action="{{ url_for('courses.enroll_course_submit') }}" method="POST" style="margin-top: 1.5rem;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="selected_course" value="NEET">
+                <button type="submit" class="course-btn" style="border: none; cursor: pointer; width: 100%;">
+                  Enroll & Pay <i class="fas fa-chevron-right"></i>
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- COMBO -->
+        <div class="course-card">
+          <div class="course-image" style="background: #eff6ff; color: #2563eb;">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="course-content">
+            <h3>GATE + NEET Combo</h3>
+            <p>Activate full preparation access to both engineering and medical courses.</p>
+            {% if 'GATE+NEET' in purchased_courses %}
+              <a href="{{ url_for('my_courses.my_courses_page') }}" class="course-btn" style="text-decoration: none; display: block; width: 100%; text-align: center; margin-top: 1.5rem; background: #2563eb;">
+                Go to Course <i class="fas fa-chevron-right"></i>
+              </a>
+            {% else %}
+              <form action="{{ url_for('courses.enroll_course_submit') }}" method="POST" style="margin-top: 1.5rem;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="selected_course" value="GATE+NEET">
+                <button type="submit" class="course-btn" style="border: none; cursor: pointer; width: 100%; background: #2563eb;">
+                  Enroll & Pay <i class="fas fa-chevron-right"></i>
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="dashboard-footer">
+      <p>© 2026 AdaptiveAI Platform. All rights reserved.</p>
+    </div>
+
+  </div>
+
+</body>
+</html>

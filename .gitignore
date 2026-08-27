@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# Runtime data
+database.db
+*.backup_*.db
+
+# User-uploaded study material
+uploads/
+
+# Logs
+*.log
+server_err.log
+server_out.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

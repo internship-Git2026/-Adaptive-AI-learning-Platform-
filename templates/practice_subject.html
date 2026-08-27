@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice {{ subject.name }} · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='my_courses.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='practice_page.css') }}" />
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    {% include 'sidebar.html' %}
+
+    <main class="app-main">
+
+      <div class="practice-shell">
+
+        <div style="margin-bottom: 1.25rem;">
+          {% if course == 'GATE' %}
+          <a href="{{ url_for('gate_course.gate_course_page') }}"
+            style="color: var(--primary-blue); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">
+            <i class="fas fa-arrow-left"></i> Back to GATE Syllabus
+          </a>
+          {% else %}
+          <a href="{{ url_for('neet_course.neet_course_page') }}"
+            style="color: #10b981; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">
+            <i class="fas fa-arrow-left"></i> Back to NEET Syllabus
+          </a>
+          {% endif %}
+        </div>
+
+        <!-- Header Banner -->
+        <div class="practice-header {{ 'neet-accent' if course == 'NEET' else '' }}">
+          <div class="practice-header-icon"><i class="{{ subject.icon }}"></i></div>
+          <div>
+            <h1><i class="fas fa-dumbbell"></i> Practice — {{ subject.name }}</h1>
+            <p>{{ subject.description }}</p>
+          </div>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="practice-card">
+          <h3 class="practice-section-title"><i class="fas fa-sparkles" style="color: var(--primary-blue);"></i> AI Subject Summary</h3>
+          <p class="practice-section-sub">A quick AI overview to orient you before practicing this subject.</p>
+
+          <div class="summary-block">
+            <p><strong>{{ subject.name }}</strong> — {{ summary.overview }}</p>
+
+            <div class="summary-meta">
+              <div>
+                <h5><i class="fas fa-tags"></i> Key Concepts</h5>
+                <div class="chip-row">
+                  {% for concept in summary.key_concepts %}
+                  <span class="chip">{{ concept }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+              <div>
+                <h5><i class="fas fa-balance-scale"></i> Exam Weightage</h5>
+                <p class="meta-value">{{ summary.weightage }}</p>
+              </div>
+              <div>
+                <h5><i class="fas fa-bullseye"></i> Focus Areas</h5>
+                <ul style="margin-left: 1.1rem; font-size: 0.9rem; color: var(--text-main); line-height: 1.7;">
+                  {% for area in summary.focus_areas %}
+                  <li>{{ area }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <div>
+                <h5><i class="fas fa-lightbulb"></i> Preparation Tip</h5>
+                <p class="meta-value">{{ summary.tips }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Practice Questions -->
+        <div class="practice-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.25rem;">
+            <h3 class="practice-section-title" style="margin-bottom: 0;"><i class="fas fa-question-circle" style="color: var(--primary-blue);"></i> Subject-wise Questions</h3>
+            <form method="POST"
+              action="{{ url_for('practice.subject_practice_refresh', course=course, subject_key=subject.key) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button type="submit" class="btn-ai {{ 'neet-btn' if course == 'NEET' else '' }}">
+                <i class="fas fa-sync-alt"></i> Generate New Questions
+              </button>
+            </form>
+          </div>
+          <p class="practice-section-sub">Tap an option to check your answer and read the explanation.</p>
+
+          {% if questions %}
+          <div id="practice-questions">
+            {% for q in questions %}
+            <div class="practice-question" data-answered="0">
+              <div class="q-text"><span style="color: var(--primary-blue); font-weight: 800;">Q{{ loop.index }}.</span> {{ q.question }}</div>
+              <div class="option-list">
+                {% for opt in q.options %}
+                <button type="button" class="option-btn" data-qid="{{ loop.index0 }}" data-idx="{{ loop.index0 }}">
+                  <span class="opt-letter">{{ ['A', 'B', 'C', 'D'][loop.index0] }}</span>
+                  <span>{{ opt }}</span>
+                </button>
+                {% endfor %}
+              </div>
+              <div class="q-feedback">
+                <div class="fb-head" style="font-weight: 700; margin-bottom: 0.25rem;"></div>
+                <div class="fb-explain"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="summary-block" style="text-align: center; padding: 2rem;">
+            <p><i class="fas fa-exclamation-triangle" style="color: #f59e0b; margin-right: 0.4rem;"></i>Could not generate questions right now. Please try the "Generate New Questions" button.</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <footer class="dashboard-footer">
+          <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+        </footer>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const answers = {{ questions | map(attribute='correct_answer') | list | tojson }};
+    const explanations = {{ questions | map(attribute='explanation') | list | tojson }};
+    const optionsText = {{ questions | map(attribute='options') | list | tojson }};
+    const letters = ['A', 'B', 'C', 'D'];
+
+    document.querySelectorAll('.option-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const card = btn.closest('.practice-question');
+        if (card.dataset.answered === '1') return;
+        card.dataset.answered = '1';
+
+        const qid = parseInt(btn.dataset.qid);
+        const picked = parseInt(btn.dataset.idx);
+        const correct = answers[qid];
+
+        card.querySelectorAll('.option-btn').forEach(function (b) {
+          b.disabled = true;
+          const bidx = parseInt(b.dataset.idx);
+          if (bidx === correct) b.classList.add('opt-correct');
+          if (bidx === picked && picked !== correct) b.classList.add('opt-wrong');
+        });
+
+        const fb = card.querySelector('.q-feedback');
+        fb.classList.add('show');
+        const head = fb.querySelector('.fb-head');
+        if (picked === correct) {
+          fb.classList.add('correct-fb');
+          head.textContent = 'Correct! ' + letters[correct] + '. ' + optionsText[qid][correct];
+        } else {
+          fb.classList.add('wrong-fb');
+          head.textContent = 'Incorrect. The correct answer is ' + letters[correct] + '. ' + optionsText[qid][correct];
+        }
+        fb.querySelector('.fb-explain').textContent = 'Explanation: ' + explanations[qid];
+      });
+    });
+  </script>
+
+</body>
+
+</html>

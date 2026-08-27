@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaptive Learning · Create Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Signup_page.css') }}" />
+
+    {% if google_auth_enabled %}
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    {% endif %}
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Left Section -->
+    <div class="left-panel">
+        <div class="logo">
+            <h2>Adaptive Learning</h2>
+        </div>
+
+        <div class="hero-content">
+            <h1>
+                Learn smarter,<br>
+                <span>rank higher.</span>
+            </h1>
+
+            <p>
+                AI-powered preparation that adapts to your pace,
+                finds your weak spots, and builds a winning study plan.
+            </p>
+
+        </div>
+    </div>
+
+    <!-- Right Section -->
+    <div class="right-panel">
+
+        <div class="signup-card">
+
+            <h1>Create your account</h1>
+            <p>Start your AI-powered journey today.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% for category, message in messages %}
+              <div class="auth-flash auth-flash-{{ category }}">{{ message }}</div>
+              {% endfor %}
+            {% endwith %}
+
+            {% if google_auth_enabled %}
+            <div class="google-signin" style="display: flex; justify-content: center; margin-bottom: 1.25rem;">
+                <div id="googleBtn"></div>
+            </div>
+
+            <form id="google-form" action="{{ url_for('google_auth.google_callback') }}" method="POST" style="display: none;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <input type="hidden" name="credential" id="google-credential" />
+                <input type="hidden" name="mode" value="signup" />
+            </form>
+            {% endif %}
+
+            <div class="divider">
+                <span>or with email</span>
+            </div>
+
+            <form action="{{ url_for('signup.signup_button') }}" method="POST">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <label>Full Name</label>
+                <input type="text" name="name" placeholder="Arjun Reddy" required>
+
+                <label>Email</label>
+                <input type="email" name="email" placeholder="you@example.com" required>
+
+                <label>Password</label>
+                <input type="password" name="password" placeholder="********" required>
+                
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" placeholder="********" required>
+
+                <label style="margin-top: 1rem; font-weight: 600; display: block; margin-bottom: 0.5rem; color: #1e293b;">Select Course Plan</label>
+                <div class="course-selector" style="display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem;">
+                    <label style="display: flex; align-items: center; border: 1.5px solid #2563eb; border-radius: 12px; padding: 0.65rem 0.9rem; cursor: pointer; transition: all 0.2s; background: #f8fafc;" onclick="selectPlan(this)">
+                        <input type="radio" name="course" value="GATE" style="margin-right: 0.8rem;" required checked>
+                        <div style="flex: 1;">
+                            <span style="font-weight: 700; color: #1e293b; display: block; text-align: left;">GATE Preparation</span>
+                            <span style="font-size: 0.85rem; color: #64748b; display: block; text-align: left;">Adaptive engineering quizzes</span>
+                        </div>
+                        <span style="font-weight: 800; color: #2563eb;">₹1,000</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.65rem 0.9rem; cursor: pointer; transition: all 0.2s; background: #fff;" onclick="selectPlan(this)">
+                        <input type="radio" name="course" value="NEET" style="margin-right: 0.8rem;">
+                        <div style="flex: 1;">
+                            <span style="font-weight: 700; color: #1e293b; display: block; text-align: left;">NEET Preparation</span>
+                            <span style="font-size: 0.85rem; color: #64748b; display: block; text-align: left;">Medical quiz bank</span>
+                        </div>
+                        <span style="font-weight: 800; color: #16a34a;">₹1,000</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.65rem 0.9rem; cursor: pointer; transition: all 0.2s; background: #fff;" onclick="selectPlan(this)">
+                        <input type="radio" name="course" value="GATE+NEET" style="margin-right: 0.8rem;">
+                        <div style="flex: 1;">
+                            <span style="font-weight: 700; color: #1e293b; display: block; text-align: left;">GATE + NEET Combo</span>
+                            <span style="font-size: 0.85rem; color: #64748b; display: block; text-align: left;">Get access to both courses</span>
+                        </div>
+                        <span style="font-weight: 800; color: #2563eb;">₹1,500</span>
+                    </label>
+                </div>
+
+                <button
+                    type="submit"
+                    id="signup_button"
+                    class="signup-btn">
+                    Create Account →
+                </button>
+
+            </form>
+
+            <script>
+            function selectPlan(labelEl) {
+                document.querySelectorAll('.course-selector label').forEach(l => {
+                    l.style.borderColor = '#e2e8f0';
+                    l.style.background = '#fff';
+                });
+                labelEl.style.borderColor = '#2563eb';
+                labelEl.style.background = '#f8fafc';
+                labelEl.querySelector('input[type="radio"]').checked = true;
+            }
+            </script>
+
+            <p class="signin-link">
+                Already have an account?
+                <a href="/signin">Sign in</a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% if google_auth_enabled %}
+<script>
+    window.onGoogleLibraryLoad = function () {
+        if (!window.google || !window.google.accounts) return;
+        google.accounts.id.initialize({
+            client_id: "{{ GOOGLE_CLIENT_ID }}",
+            callback: handleGoogleCredential
+        });
+        const el = document.getElementById('googleBtn');
+        if (el) {
+            const width = el.clientWidth || 320;
+            google.accounts.id.renderButton(el, {
+                type: 'standard',
+                theme: 'outline',
+                size: 'large',
+                width: width,
+                text: 'continue_with',
+                shape: 'pill'
+            });
+        }
+    };
+
+    function handleGoogleCredential(response) {
+        try {
+            if (response && response.credential) {
+                document.getElementById('google-credential').value = response.credential;
+                document.getElementById('google-form').submit();
+                return;
+            }
+        } catch (err) {
+            alert('Google sign-in failed: ' + err.message);
+            return;
+        }
+        alert('Google did not return a sign-in credential. Please try again.');
+    }
+</script>
+{% endif %}
+
+</body>
+</html>

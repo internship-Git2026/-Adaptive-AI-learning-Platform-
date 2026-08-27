@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trial Used · AdaptiveAI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='trial.css') }}">
+</head>
+<body>
+
+  <div class="trial-container" style="max-width: 600px; text-align: center;">
+    
+    <div class="lock-icon-wrapper" style="width: 70px; height: 70px; font-size: 2rem; margin-bottom: 1.5rem;">
+      <i class="fas fa-circle-exclamation text-red" style="color: #dc2626;"></i>
+    </div>
+
+    <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.8rem; letter-spacing: -1px; color: var(--text-main);">
+      Trial Credit Exhausted
+    </h1>
+    
+    <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.5; max-width: 450px; margin: 0 auto 2.5rem auto;">
+      You have already used your free trial session on this browser. Create an account or sign in to continue using AdaptiveAI.
+    </p>
+
+    <div class="premium-actions" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="{{ url_for('signup.signup_page') }}" class="btn-buy" style="padding: 0.9rem 2.2rem;">
+        <i class="fas fa-user-plus"></i> Create Account
+      </a>
+      <a href="{{ url_for('signin.signin_page') }}" class="btn-signin-redirect" style="padding: 0.9rem 2.2rem; font-weight: 700;">
+        Sign In
+      </a>
+    </div>
+
+    <div style="margin-top: 2rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+      <a href="{{ url_for('main.home') }}" style="color: var(--primary-color); font-weight: 600; text-decoration: none; font-size: 0.9rem;">
+        <i class="fas fa-arrow-left"></i> Back to Homepage
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

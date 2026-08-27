@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Courses · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='my_courses.css') }}" />
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Sidebar Menu Inclusion -->
+    {% include 'sidebar.html' %}
+    
+    <!-- Main Courses Body -->
+    <main class="app-main">
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert-flash {{ category }}">
+              <i class="fas fa-circle-info"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Header Section -->
+      <div class="courses-header">
+        <h1>My Enrolled Courses</h1>
+        <p>Access your purchased study tracks, view syllabus subjects, and upload study guides.</p>
+      </div>
+
+      <!-- Course Cards Grid -->
+      <div class="course-grid">
+
+        {% if 'GATE' in purchased_courses or 'GATE+NEET' in purchased_courses %}
+        <!-- GATE Card -->
+        <div class="course-card">
+          <div class="course-thumbnail gate">
+            <i class="fas fa-microchip"></i>
+            <div class="course-thumbnail-overlay">
+              <span class="course-badge">ACTIVE</span>
+            </div>
+          </div>
+          
+          <div class="course-body">
+            <h2>GATE Preparation Track</h2>
+            <p class="desc">AI-powered preparation for Graduate Aptitude Test in Engineering. Upload syllabus PDFs, take dynamic practice quizzes, and track weak areas.</p>
+            
+            <div class="course-meta">
+              <span><i class="fas fa-file-pdf"></i> {{ gate_stats.total }} PDFs Uploaded</span>
+              <span><i class="fas fa-layer-group"></i> 4 Modules</span>
+            </div>
+
+            <!-- Dynamic Progress (computed from quiz results) -->
+            <div class="course-progress-container">
+              <div class="course-progress-header">
+                <span>Course Progress</span>
+                <span>{{ gate_progress }}%</span>
+              </div>
+              <div class="course-progress-track">
+                <div class="course-progress-fill" style="width: {{ gate_progress if gate_progress > 0 else 2 }}%;"></div>
+              </div>
+            </div>
+
+            <div class="course-actions">
+              <a href="{{ url_for('gate_course.gate_course_page') }}" class="btn-course-primary">
+                Continue Learning <i class="fas fa-arrow-right" style="margin-left: 0.25rem;"></i>
+              </a>
+              <a href="{{ url_for('pdf_upload.upload_page', course='GATE') }}" class="btn-course-secondary">
+                <i class="fas fa-cloud-upload-alt"></i> Upload
+              </a>
+            </div>
+
+            <button onclick="toggleHistory('gate-history')" class="history-toggle-btn">
+              <i class="fas fa-history"></i> Study Material Logs <i class="fas fa-chevron-down" id="gate-history-icon"></i>
+            </button>
+
+            <!-- Collapsible PDF History -->
+            <div id="gate-history" style="display: none; margin-top: 1rem; border-top: 1px dashed var(--border-color); padding-top: 0.5rem;">
+              {% if gate_pdfs %}
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 200px; overflow-y: auto; padding-right: 0.25rem;">
+                  {% for pdf in gate_pdfs %}
+                    <div class="history-item">
+                      <div style="flex: 1; min-width: 0; margin-right: 0.5rem;">
+                        <div style="font-weight: 700; color: var(--text-main); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" title="{{ pdf.pdf_name }}">{{ pdf.pdf_name }}</div>
+                        <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem;">
+                          {{ pdf.pdf_type }} · {{ pdf.total_pages }} pgs · {{ pdf.upload_time }}
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 0.3rem;">
+                        <a href="{{ url_for('pdf_upload.preview_file', pdf_id=pdf.id) }}" class="btn-history-view">View</a>
+                        <form action="{{ url_for('pdf_upload.delete_file', pdf_id=pdf.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this PDF and its extracted text?');">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="btn-history-delete"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center; margin: 1rem 0 0.5rem;">No study materials uploaded yet.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if 'NEET' in purchased_courses or 'GATE+NEET' in purchased_courses %}
+        <!-- NEET Card -->
+        <div class="course-card">
+          <div class="course-thumbnail neet">
+            <i class="fas fa-stethoscope"></i>
+            <div class="course-thumbnail-overlay">
+              <span class="course-badge">ACTIVE</span>
+            </div>
+          </div>
+          
+          <div class="course-body">
+            <h2>NEET Preparation Track</h2>
+            <p class="desc">Practice Biology, Chemistry, and Physics with adaptive mock test queries generated from custom textbooks and class notes.</p>
+            
+            <div class="course-meta">
+              <span><i class="fas fa-file-pdf"></i> {{ neet_stats.total }} PDFs Uploaded</span>
+              <span><i class="fas fa-layer-group"></i> 3 Modules</span>
+            </div>
+
+            <!-- Dynamic Progress (computed from quiz results) -->
+            <div class="course-progress-container">
+              <div class="course-progress-header">
+                <span>Course Progress</span>
+                <span>{{ neet_progress }}%</span>
+              </div>
+              <div class="course-progress-track">
+                <div class="course-progress-fill neet" style="width: {{ neet_progress if neet_progress > 0 else 2 }}%;"></div>
+              </div>
+            </div>
+
+            <div class="course-actions">
+              <a href="{{ url_for('neet_course.neet_course_page') }}" class="btn-course-primary neet">
+                Continue Learning <i class="fas fa-arrow-right" style="margin-left: 0.25rem;"></i>
+              </a>
+              <a href="{{ url_for('pdf_upload.upload_page', course='NEET') }}" class="btn-course-secondary">
+                <i class="fas fa-cloud-upload-alt"></i> Upload
+              </a>
+            </div>
+
+            <button onclick="toggleHistory('neet-history')" class="history-toggle-btn neet">
+              <i class="fas fa-history"></i> Study Material Logs <i class="fas fa-chevron-down" id="neet-history-icon"></i>
+            </button>
+
+            <!-- Collapsible PDF History -->
+            <div id="neet-history" style="display: none; margin-top: 1rem; border-top: 1px dashed var(--border-color); padding-top: 0.5rem;">
+              {% if neet_pdfs %}
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 200px; overflow-y: auto; padding-right: 0.25rem;">
+                  {% for pdf in neet_pdfs %}
+                    <div class="history-item">
+                      <div style="flex: 1; min-width: 0; margin-right: 0.5rem;">
+                        <div style="font-weight: 700; color: var(--text-main); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" title="{{ pdf.pdf_name }}">{{ pdf.pdf_name }}</div>
+                        <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem;">
+                          {{ pdf.pdf_type }} · {{ pdf.total_pages }} pgs · {{ pdf.upload_time }}
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 0.3rem;">
+                        <a href="{{ url_for('pdf_upload.preview_file', pdf_id=pdf.id) }}" class="btn-history-view">View</a>
+                        <form action="{{ url_for('pdf_upload.delete_file', pdf_id=pdf.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this PDF and its extracted text?');">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="btn-history-delete"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center; margin: 1rem 0 0.5rem;">No study materials uploaded yet.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Footer -->
+      <footer class="dashboard-footer">
+        <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleHistory(id) {
+      const el = document.getElementById(id);
+      const icon = document.getElementById(id + '-icon');
+      if (el.style.display === 'none') {
+        el.style.display = 'block';
+        icon.className = 'fas fa-chevron-up';
+      } else {
+        el.style.display = 'none';
+        icon.className = 'fas fa-chevron-down';
+      }
+    }
+  </script>
+</body>
+</html>

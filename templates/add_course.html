@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Add Course</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='profile.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<nav>
+
+    <div class="logo">
+
+        <i class="fa-solid fa-brain"></i>
+
+        AdaptiveAI Platform
+
+    </div>
+
+</nav>
+
+<div class="add-course-container">
+
+    <div class="add-course-card">
+
+        <h1>
+
+            <i class="fa-solid fa-book-open"></i>
+
+            Add Course
+
+        </h1>
+
+        <!-- ================= MY COURSES ================= -->
+
+        <div class="owned-course">
+
+            <h2>
+
+                <i class="fa-solid fa-graduation-cap"></i>
+
+                My Courses
+
+            </h2>
+
+            {% for course in my_courses %}
+
+            <div class="course-box">
+
+                <h3>{{ course.course_name }}</h3>
+
+                <span class="owned-badge">
+
+                    Active
+
+                </span>
+
+            </div>
+
+            {% else %}
+
+            <div class="course-box">
+
+                <h3>No courses purchased yet</h3>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- ================= AVAILABLE COURSES ================= -->
+
+        <div class="available-courses">
+
+            <h2>
+
+                <i class="fa-solid fa-layer-group"></i>
+
+                Available Courses
+
+            </h2>
+
+            {% if 'GATE' not in owned_course_names %}
+
+            <div class="course-box">
+
+                <div>
+
+                    <h3>GATE</h3>
+
+                    <p>Engineering Entrance Preparation</p>
+
+                    <span class="price">₹999</span>
+
+                </div>
+
+                <a href="{{ url_for('plans.plans_page', course='GATE') }}"
+                   class="buy-btn"
+                   style="display:inline-block; text-decoration:none; text-align:center;">
+
+                    Buy Now
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+            {% if 'NEET' not in owned_course_names %}
+
+            <div class="course-box">
+
+                <div>
+
+                    <h3>NEET</h3>
+
+                    <p>Medical Entrance Preparation</p>
+
+                    <span class="price">₹999</span>
+
+                </div>
+
+                <a href="{{ url_for('plans.plans_page', course='NEET') }}"
+                   class="buy-btn"
+                   style="display:inline-block; text-decoration:none; text-align:center;">
+
+                    Buy Now
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+            {% if 'GATE+NEET' not in owned_course_names %}
+
+            <div class="course-box">
+
+                <div>
+
+                    <h3>GATE + NEET</h3>
+
+                    <p>Combo for Engineering & Medical</p>
+
+                    <span class="price">₹1,499</span>
+
+                </div>
+
+                <a href="{{ url_for('plans.plans_page', course='GATE+NEET') }}"
+                   class="buy-btn"
+                   style="display:inline-block; text-decoration:none; text-align:center;">
+
+                    Buy Now
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <a href="{{ url_for('profile.profile_page') }}"
+           class="back-profile-btn">
+
+            ← Back to Profile
+
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

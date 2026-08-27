@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trial Performance Results · AdaptiveAI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='trial.css') }}">
+</head>
+<body>
+
+  <div class="trial-container" style="max-width: 750px;">
+    
+    <div style="margin-bottom: 1.5rem;">
+      <a href="{{ url_for('dashboard.dashboard_page') }}" style="color: var(--primary-blue, #2563eb); font-weight: 700; text-decoration: none; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+
+    <div class="trial-badge">
+      <i class="fas fa-chart-bar"></i> Performance Summary
+    </div>
+
+    <div class="trial-header" style="margin-bottom: 2rem;">
+      <h1>Your Trial Results</h1>
+      <p>Here is your performance summary based on the first five questions. Unlock paid access to view full quiz analytics and solutions.</p>
+    </div>
+
+    <!-- ===== MAIN STATS ROW ===== -->
+    <div class="credits-grid" style="margin-bottom: 2rem;">
+      <div class="credit-card">
+        <div class="credit-icon" style="background: #e0f2fe; color: #0284c7;">
+          <i class="fas fa-square-poll-vertical"></i>
+        </div>
+        <div class="credit-info">
+          <span class="credit-label">Trial Score</span>
+          <span class="credit-val">{{ score }} / {{ total_questions }} Correct</span>
+        </div>
+      </div>
+      
+      <div class="credit-card">
+        <div class="credit-icon" style="background: #f0fdf4; color: #16a34a;">
+          <i class="fas fa-bullseye"></i>
+        </div>
+        <div class="credit-info">
+          <span class="credit-label">Accuracy Rate</span>
+          <span class="credit-val">{{ percentage }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(226, 232, 240, 0.5); padding-bottom: 0.8rem;">
+        <span style="font-weight: 600; color: var(--text-muted);">Attempted Questions</span>
+        <span style="font-weight: 700; color: var(--text-main);">5 / 10</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="font-weight: 600; color: var(--text-muted);">Weakest Subject Focus</span>
+        <span style="font-weight: 700; color: var(--warning-color);">
+          {% if course == 'GATE' %}
+            Engineering Mathematics & Core Analysis
+          {% else %}
+            Organic Biochemistry & Applied Physics
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- ===== LOCKED SECTIONS ROW ===== -->
+    <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1.2rem;">Detailed Insights</h2>
+    <div class="locked-results-container">
+      <div class="locked-section-card">
+        <div class="locked-section-info">
+          <span class="locked-section-title"><i class="fas fa-graduation-cap"></i> Complete Question Explanations</span>
+          <span class="locked-section-desc">Unlock full textual answers, correct option hints, and step-by-step methodologies.</span>
+        </div>
+        <div class="lock-badge"><i class="fas fa-lock"></i> Locked</div>
+      </div>
+
+      <div class="locked-section-card">
+        <div class="locked-section-info">
+          <span class="locked-section-title"><i class="fas fa-chart-line"></i> Performance Improvement Graph</span>
+          <span class="locked-section-desc">Track mock test records over time and verify your exam rank curves.</span>
+        </div>
+        <div class="lock-badge"><i class="fas fa-lock"></i> Locked</div>
+      </div>
+
+      <div class="locked-section-card">
+        <div class="locked-section-info">
+          <span class="locked-section-title"><i class="fas fa-list-check"></i> Sub-Topic Weak Area Report</span>
+          <span class="locked-section-desc">Verify which specific sections of the chapter need revision.</span>
+        </div>
+        <div class="lock-badge"><i class="fas fa-lock"></i> Locked</div>
+      </div>
+    </div>
+
+    <!-- ===== UPGRADE CARD ===== -->
+    <div class="premium-lock-card" style="margin-top: 3rem;">
+      <div class="lock-icon-wrapper" style="background: #eff6ff; color: #2563eb; border-color: rgba(37, 99, 235, 0.1);">
+        <i class="fas fa-award"></i>
+      </div>
+      <h2>Upgrade to Premium</h2>
+      <p>Unlock our adaptive learning suite. Ingest unlimited books/materials and generate endless AI exam questions.</p>
+      
+      <div class="premium-actions">
+        <a href="{{ url_for('dashboard.dashboard_page') }}" class="btn-buy" style="background: #2563eb; text-decoration: none;"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <a href="{{ url_for('signup.signup_page', course='GATE') }}" class="btn-buy"><i class="fas fa-graduation-cap"></i> Buy GATE Suite</a>
+        <a href="{{ url_for('signup.signup_page', course='NEET') }}" class="btn-buy neet-btn"><i class="fas fa-stethoscope"></i> Buy NEET Suite</a>
+        <a href="{{ url_for('signin.signin_page') }}" class="btn-signin-redirect">Sign In</a>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

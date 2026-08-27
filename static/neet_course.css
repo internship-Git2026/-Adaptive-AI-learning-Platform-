@@ -1,0 +1,46 @@
+/* neet_course.css */
+@import url("Dashboard_page.css");
+
+.module-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.module-card {
+  background: white;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.module-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.module-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.start-btn {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.start-btn:hover { background: #15803d; }

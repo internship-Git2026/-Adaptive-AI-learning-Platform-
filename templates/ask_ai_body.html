@@ -1,0 +1,61 @@
+<!-- Ask AI chat body (shared between logged-in and public layouts) -->
+
+<div class="practice-header" style="margin-top: 0;">
+  <div class="practice-header-icon" style="color:#a78bfa;"><i class="fas fa-robot"></i></div>
+  <div>
+    <h1><i class="fas fa-brain" style="color:#a78bfa;"></i> Ask AI</h1>
+    <p>I can explain how this website works — features, courses, pricing, quizzes, and more.</p>
+  </div>
+</div>
+
+<div class="practice-card">
+  <h3 class="practice-section-title"><i class="fas fa-comments" style="color: var(--primary-blue);"></i> Chat</h3>
+  <p class="practice-section-sub">Ask anything about using Adaptive Learning, and I will answer based on what this website offers.</p>
+
+  <div class="chat-window" id="chatWindow">
+    {% if history %}
+      {% for turn in history %}
+      <div class="chat-msg user-msg">{{ turn.q }}</div>
+      <div class="chat-msg ai-msg">{{ turn.a }}</div>
+      {% endfor %}
+    {% else %}
+      <div class="chat-msg ai-msg">
+        Hi! 👋 I'm the platform guide. I can help you understand how this website works — for example, how to
+        pick a course, upload study PDFs, generate AI quizzes, practice subjects, or track your progress.
+        What would you like to know?
+      </div>
+    {% endif %}
+  </div>
+
+  <form method="POST" action="{{ url_for('practice.ask_ai') }}" class="chat-input-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <textarea name="question" id="askQuestion" rows="2"
+      placeholder="e.g. How do I generate an AI quiz from my PDF?" required></textarea>
+    <button type="submit" class="btn-ai" style="align-self: flex-start;">
+      <i class="fas fa-paper-plane"></i> Ask
+    </button>
+  </form>
+
+  <div class="suggestion-row">
+    {% for s in suggestions %}
+    <button type="button" class="suggestion-chip" data-question="{{ s }}"><i class="fas fa-lightbulb"></i> {{ s }}</button>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  const chatWindow = document.getElementById('chatWindow');
+  if (chatWindow) {
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  document.querySelectorAll('.suggestion-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      const input = document.getElementById('askQuestion');
+      if (input) {
+        input.value = chip.dataset.question;
+        input.focus();
+      }
+    });
+  });
+</script>

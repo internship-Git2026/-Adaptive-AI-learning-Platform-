@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Trial Dashboard · AdaptiveAI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='trial.css') }}">
+</head>
+<body>
+
+  <div class="trial-container">
+    
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="spinner"></div>
+      <h2 class="loading-title" id="loading-title">Processing file...</h2>
+      <p class="loading-desc" id="loading-desc">Our AI validator is reading your PDF to verify alignment with the course syllabus. This will take a moment.</p>
+      <div class="progress-container">
+        <div class="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert-flash {{ category }}">
+            {% if category == 'success' %}
+              <i class="fas fa-circle-check"></i>
+            {% else %}
+              <i class="fas fa-circle-exclamation"></i>
+            {% endif %}
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="trial-badge">
+      <i class="fas fa-bolt"></i> Free Trial
+    </div>
+
+    <div class="trial-header">
+      <h1>Welcome to AdaptiveAI Trial</h1>
+      <p>Test drive our AI-powered learning environment. Ingest a syllabus topic or chapter PDF to instantly build a personalized practice quiz.</p>
+    </div>
+
+    <!-- ===== CREDITS STATS ===== -->
+    <div class="credits-grid">
+      <div class="credit-card {% if trial.pdf_uploaded %}used{% endif %}">
+        <div class="credit-icon">
+          <i class="fas fa-file-pdf text-blue" style="color: #2563eb;"></i>
+        </div>
+        <div class="credit-info">
+          <span class="credit-label">PDF Ingestion Credit</span>
+          <span class="credit-val">{% if trial.pdf_uploaded %}0 / 1 Used{% else %}1 / 1 Available{% endif %}</span>
+        </div>
+      </div>
+      <div class="credit-card {% if trial.quiz_generated %}used{% endif %}">
+        <div class="credit-icon">
+          <i class="fas fa-brain text-purple" style="color: #60a5fa;"></i>
+        </div>
+        <div class="credit-info">
+          <span class="credit-label">Quiz Generation Credit</span>
+          <span class="credit-val">{% if trial.quiz_generated %}0 / 1 Used{% else %}1 / 1 Available{% endif %}</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 1.2rem;">Active Course Exam: <span style="color: #2563eb;">{{ trial.course }}</span></h2>
+
+    {% if not trial.pdf_uploaded %}
+      <!-- ===== PDF UPLOAD BOX ===== -->
+      <div class="drop-zone" id="drop-zone">
+        <i class="fas fa-cloud-upload-alt drop-icon"></i>
+        <h3 id="drop-title">Drag & Drop study chapter here</h3>
+        <p id="drop-desc">or click to browse from your device</p>
+        <span class="browse-btn">Choose PDF</span>
+        
+        <form action="{{ url_for('pdf_upload.upload_file', course=trial.course) }}" method="POST" enctype="multipart/form-data" id="upload-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="file" name="file" id="file-input" accept=".pdf" required />
+        </form>
+      </div>
+
+      <div class="file-specs">
+        <span><i class="fas fa-file-circle-check"></i> PDF format only</span>
+        <span><i class="fas fa-hard-drive"></i> Max 20 MB size limit</span>
+      </div>
+
+    {% elif trial.pdf_uploaded and not trial.quiz_generated %}
+      <!-- ===== GENERATE QUIZ BOX ===== -->
+      <div class="status-card">
+        <div class="status-item">
+          <div class="status-info-row">
+            <div class="status-icon-circle">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="status-details">
+              <span class="status-title">Study Material Processed</span>
+              <span class="status-subtitle">{{ pdf.pdf_name }} ({{ pdf.total_pages }} pages)</span>
+            </div>
+          </div>
+          <span style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Method: {{ pdf.pdf_type }}</span>
+        </div>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <form action="{{ url_for('trial.generate_quiz', pdf_id=pdf_id) }}" method="POST" id="quiz-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button type="submit" class="status-action-btn" style="padding: 0.9rem 2.5rem; font-size: 1rem;">
+              <i class="fas fa-magic"></i> Generate AI Quiz Now
+            </button>
+          </form>
+        </div>
+      </div>
+
+    {% endif %}
+
+  </div>
+
+  <script>
+    // Sync localStorage with database trial variables to prevent repeat abuse
+    localStorage.setItem('trial_id', '{{ trial.trial_id }}');
+    localStorage.setItem('browser_token', '{{ trial.browser_token }}');
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const uploadForm = document.getElementById('upload-form');
+    const quizForm = document.getElementById('quiz-form');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingTitle = document.getElementById('loading-title');
+    const loadingDesc = document.getElementById('loading-desc');
+    const dropTitle = document.getElementById('drop-title');
+    const dropDesc = document.getElementById('drop-desc');
+
+    if (dropZone && fileInput && uploadForm) {
+      // Direct clicks to file upload input
+      dropZone.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      // Drag highlights
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        }, false);
+      });
+
+      // File drop attachment
+      dropZone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length) {
+          fileInput.files = files;
+          handleFileSelection(files[0]);
+        }
+      });
+
+      // Select handler
+      fileInput.addEventListener('change', (e) => {
+        if (fileInput.files.length) {
+          handleFileSelection(fileInput.files[0]);
+        }
+      });
+
+      function handleFileSelection(file) {
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+          alert("Unsupported file format. Please select a PDF file.");
+          fileInput.value = '';
+          return;
+        }
+
+        const sizeMB = file.size / (1024 * 1024);
+        if (sizeMB > 20) {
+          alert("File exceeds maximum 20MB limit.");
+          fileInput.value = '';
+          return;
+        }
+
+        dropTitle.innerText = file.name;
+        dropDesc.innerText = `Selected (${sizeMB.toFixed(2)} MB). Uploading...`;
+
+        // Automatically trigger form upload on selection
+        showLoader("Uploading PDF...", "We are transferring your study material to the server and extracting the raw text contents. Larger documents may take a few seconds.");
+        uploadForm.submit();
+      }
+    }
+
+    if (quizForm) {
+      quizForm.addEventListener('submit', () => {
+        showLoader("Generating Quiz...", "Gemini is reviewing the core topics in your PDF. We are generating 10 highly relevant multiple-choice questions matching your syllabus.");
+      });
+    }
+
+    function showLoader(title, desc) {
+      if (loadingOverlay) {
+        loadingTitle.innerText = title;
+        loadingDesc.innerText = desc;
+        loadingOverlay.style.display = 'flex';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adaptive Quiz Result · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='my_courses.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='practice_page.css') }}" />
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    {% include 'sidebar.html' %}
+
+    <main class="app-main">
+
+      <div class="practice-shell">
+
+        <div style="margin-bottom: 1.25rem;">
+          {% if course == 'GATE' %}
+          <a href="{{ url_for('gate_course.gate_course_page') }}"
+            style="color: var(--primary-blue); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">
+            <i class="fas fa-arrow-left"></i> Back to GATE Syllabus
+          </a>
+          {% else %}
+          <a href="{{ url_for('neet_course.neet_course_page') }}"
+            style="color: #10b981; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">
+            <i class="fas fa-arrow-left"></i> Back to NEET Syllabus
+          </a>
+          {% endif %}
+        </div>
+
+        <div class="practice-header {{ 'neet-accent' if course == 'NEET' else '' }}">
+          <div class="practice-header-icon"><i class="fas fa-trophy"></i></div>
+          <div>
+            <h1><i class="fas fa-bolt"></i> Adaptive Quiz Complete</h1>
+            <p>Here is how you performed on the {{ course }} adaptive quiz.</p>
+          </div>
+        </div>
+
+        <div class="quiz-big-card" style="text-align: center;">
+          <div class="result-score-ring" style="--ring: {{ percentage * 3.6 }}deg;">
+            <div class="result-score-ring-inner">
+              <span class="big">{{ score }}/{{ total }}</span>
+              <span class="small">{{ percentage }}%</span>
+            </div>
+          </div>
+
+          {% if percentage >= 70 %}
+          <h2 style="font-size: 1.3rem; color: #065f46;">Great job! <i class="fas fa-star"></i></h2>
+          <p style="color: var(--text-muted); margin-top: 0.4rem;">Your grasp of the weak-area concepts is improving. Keep practising to push higher.</p>
+          {% elif percentage >= 40 %}
+          <h2 style="font-size: 1.3rem; color: #1e3a8a;">Good attempt — keep going!</h2>
+          <p style="color: var(--text-muted); margin-top: 0.4rem;">Review the explanations below, especially for the questions you missed.</p>
+          {% else %}
+          <h2 style="font-size: 1.3rem; color: #991b1b;">Don't worry — this is where growth starts.</h2>
+          <p style="color: var(--text-muted); margin-top: 0.4rem;">Focus on the weak areas highlighted below and revisit this subject soon.</p>
+          {% endif %}
+
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+            Answered {{ answered_count }} of {{ total }} questions.
+          </p>
+
+          <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem;">
+            <form method="POST" action="{{ url_for('practice.adaptive_restart', course=course) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button type="submit" class="btn-ai {{ 'neet-btn' if course == 'NEET' else '' }}">
+                <i class="fas fa-redo-alt"></i> Retake Quiz
+              </button>
+            </form>
+            {% if course == 'GATE' %}
+            <a class="btn-ai btn-ghost" href="{{ url_for('gate_course.gate_course_page') }}"><i class="fas fa-book-open"></i> Back to Syllabus</a>
+            {% else %}
+            <a class="btn-ai btn-ghost" href="{{ url_for('neet_course.neet_course_page') }}"><i class="fas fa-book-open"></i> Back to Syllabus</a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Review -->
+        <div class="practice-card" style="margin-top: 1.5rem;">
+          <h3 class="practice-section-title"><i class="fas fa-clipboard-check" style="color: var(--primary-blue);"></i> Answer Review</h3>
+          <p class="practice-section-sub">Understand each solution so the next adaptive quiz starts from a stronger base.</p>
+
+          {% for q in questions %}
+          {% set picked = answers.get(loop.index) %}
+          {% set was_correct = picked == q.correct_answer %}
+          <div class="review-question">
+            <div class="rq-head">
+              <span>Q{{ loop.index }}.</span> {{ q.question }}
+              {% if picked is none %}
+              <span class="rq-status" style="background:#fef3c7;color:#92400e;">Skipped</span>
+              {% elif was_correct %}
+              <span class="rq-status ok"><i class="fas fa-check"></i> Correct</span>
+              {% else %}
+              <span class="rq-status no"><i class="fas fa-times"></i> Incorrect</span>
+              {% endif %}
+            </div>
+
+            <div class="rq-options">
+              {% for opt in q.options %}
+              {% if loop.index0 == q.correct_answer %}
+              <div class="rq-option right"><i class="fas fa-check-circle"></i> {{ ['A', 'B', 'C', 'D'][loop.index0] }}. {{ opt }}</div>
+              {% elif picked is not none and loop.index0 == picked %}
+              <div class="rq-option picked-wrong"><i class="fas fa-times-circle"></i> {{ ['A', 'B', 'C', 'D'][loop.index0] }}. {{ opt }} (your answer)</div>
+              {% else %}
+              <div class="rq-option">{{ ['A', 'B', 'C', 'D'][loop.index0] }}. {{ opt }}</div>
+              {% endif %}
+              {% endfor %}
+            </div>
+
+            <div class="rq-explanation"><strong>Explanation:</strong> {{ q.explanation }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <footer class="dashboard-footer">
+          <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+        </footer>
+
+      </div>
+    </main>
+  </div>
+
+</body>
+
+</html>

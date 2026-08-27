@@ -1,0 +1,105 @@
+<!-- ================= SETTINGS PANEL ================= -->
+
+<div class="settings-panel" id="settingsPanel">
+
+    <!-- Header -->
+
+    <div class="settings-header">
+
+        <h2>
+            <i class="fa-solid fa-gear"></i>
+            Account Settings
+        </h2>
+
+        <button id="closeSettings" class="close-btn">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+    <!-- ================= SETTINGS MENU ================= -->
+
+    <div class="settings-menu">
+
+        <!-- Add Course -->
+
+        <a href="{{ url_for('add_course.add_course') }}"
+   class="setting-link">
+
+<div class="setting-card">
+
+    <div>
+
+        <h3>
+
+            <i class="fa-solid fa-book"></i>
+
+            Add Course
+
+        </h3>
+
+        <p>
+
+            Purchase another course.
+
+        </p>
+
+    </div>
+
+    <i class="fa-solid fa-angle-right"></i>
+
+</div>
+
+</a>
+
+        <!-- Edit Profile -->
+
+       <a href="{{ url_for('edit_profile.edit_profile') }}"
+   class="setting-link">
+
+    <div class="setting-card">
+
+        <div>
+
+            <h3>
+                <i class="fa-solid fa-user-pen"></i>
+                Edit Profile
+            </h3>
+
+            <p>Update your personal information.</p>
+
+        </div>
+
+        <i class="fa-solid fa-angle-right"></i>
+
+    </div>
+
+</a>
+
+        <!-- Logout -->
+
+        <a href="{{ url_for('main.logout') }}"
+           class="logout-link">
+
+            <div class="setting-card logout-card">
+
+                <div>
+
+                    <h3>
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Logout
+                    </h3>
+
+                    <p>Sign out safely.</p>
+
+                </div>
+
+                <i class="fa-solid fa-angle-right"></i>
+
+            </div>
+
+        </a>
+
+    </div>
+
+   

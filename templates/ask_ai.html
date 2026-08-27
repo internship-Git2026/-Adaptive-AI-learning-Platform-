@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ask AI · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='my_courses.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='practice_page.css') }}" />
+</head>
+
+<body>
+
+  {% if user %}
+  <div class="app-layout">
+    {% include 'sidebar.html' %}
+    <main class="app-main">
+      <div class="practice-shell askai-shell">
+        {% include 'ask_ai_body.html' %}
+      </div>
+    </main>
+  </div>
+  {% else %}
+  <div class="askai-public">
+    <header class="askai-public-header">
+      <div class="askai-public-brand">
+        <i class="fas fa-brain"></i>
+        <span>Adaptive Learning</span>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="{{ url_for('signin.signin_page') }}" class="askai-public-link">Sign in</a>
+        <a href="{{ url_for('signup.signup_page') }}" class="askai-public-signup"><i class="fas fa-user-plus"></i> Get Started Free</a>
+      </div>
+    </header>
+    <main class="askai-public-main">
+      <div class="practice-shell askai-shell">
+        {% include 'ask_ai_body.html' %}
+      </div>
+    </main>
+    <footer class="askai-public-footer">© 2026 AdaptiveGATE AI. All rights reserved.</footer>
+  </div>
+  {% endif %}
+
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+/* ===========================
+   QUIZ SETTINGS
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f4f7fc;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:30px;
+}
+
+.settings-container{
+    width:100%;
+    max-width:700px;
+}
+
+.settings-card{
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:35px;
+
+    box-shadow:0 12px 35px rgba(0,0,0,.08);
+
+}
+
+.header{
+
+    text-align:center;
+
+    margin-bottom:35px;
+
+}
+
+.header i{
+
+    font-size:45px;
+
+    color:#2563eb;
+
+    margin-bottom:15px;
+
+}
+
+.header h1{
+
+    color:#1e293b;
+
+    margin-bottom:8px;
+
+}
+
+.header p{
+
+    color:#64748b;
+
+}
+
+.setting-block{
+
+    margin-bottom:30px;
+
+}
+
+.setting-block h3{
+
+    margin-bottom:15px;
+
+    color:#1e293b;
+
+}
+
+.options{
+
+    display:flex;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+}
+
+.options label{
+
+    flex:1;
+
+    min-width:150px;
+
+    cursor:pointer;
+
+}
+
+.options input{
+
+    display:none;
+
+}
+
+.options span{
+
+    display:block;
+
+    text-align:center;
+
+    padding:14px;
+
+    border:2px solid #dbe4f0;
+
+    border-radius:12px;
+
+    transition:.3s;
+
+    font-weight:600;
+
+}
+
+.options input:checked + span{
+
+    background:#2563eb;
+
+    color:white;
+
+    border-color:#2563eb;
+
+}
+
+.fixed-box{
+
+    background:#eef4ff;
+
+    border:2px solid #2563eb;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    font-weight:600;
+
+    color:#2563eb;
+
+}
+
+.generate-btn{
+
+    width:100%;
+
+    margin-top:20px;
+
+    border:none;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:16px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.generate-btn:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+
+}

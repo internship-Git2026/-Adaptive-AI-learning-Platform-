@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adaptive Quiz {{ course }} · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='my_courses.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='practice_page.css') }}" />
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    {% include 'sidebar.html' %}
+
+    <main class="app-main">
+
+      <div class="practice-shell quiz-big">
+
+        <div style="margin-bottom: 1.25rem;">
+          {% if course == 'GATE' %}
+          <a href="{{ url_for('gate_course.gate_course_page') }}"
+            style="color: var(--primary-blue); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">
+            <i class="fas fa-arrow-left"></i> Back to GATE Syllabus
+          </a>
+          {% else %}
+          <a href="{{ url_for('neet_course.neet_course_page') }}"
+            style="color: #10b981; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">
+            <i class="fas fa-arrow-left"></i> Back to NEET Syllabus
+          </a>
+          {% endif %}
+        </div>
+
+        <!-- Header Banner -->
+        <div class="practice-header {{ 'neet-accent' if course == 'NEET' else '' }}">
+          <div class="practice-header-icon"><i class="fas fa-bolt"></i></div>
+          <div>
+            <h1><i class="fas fa-bolt"></i> GATE Adaptive Quiz</h1>
+            <p>Questions are generated on the fly from your weakest areas and past performance.</p>
+          </div>
+        </div>
+
+        {% if question %}
+
+        <!-- ============ QUESTION VIEW ============ -->
+        <div class="quiz-big-card">
+
+          <div class="quiz-progress">
+            <div class="quiz-progress-track">
+              <div class="quiz-progress-fill" style="width: {{ (index / total * 100) | round }}%;"></div>
+            </div>
+            <span class="quiz-progress-label">Question {{ index }} of {{ total }}</span>
+          </div>
+
+          <div class="quiz-q-text">{{ question.question }}</div>
+
+          {% if answered is not none %}
+          <!-- Review / answered view -->
+          {% set was_correct = answered == question.correct_answer %}
+          <div class="option-list">
+            {% for opt in question.options %}
+            <button type="button" class="option-btn
+              {{ 'opt-correct' if loop.index0 == question.correct_answer else ('opt-wrong' if loop.index0 == answered else '') }}"
+              disabled>
+              <span class="opt-letter">{{ ['A', 'B', 'C', 'D'][loop.index0] }}</span>
+              <span>{{ opt }}</span>
+            </button>
+            {% endfor %}
+          </div>
+
+          <div class="quiz-feedback-box show {{ 'correct-fb' if was_correct else 'wrong-fb' }}">
+            {% if was_correct %}
+            <strong><i class="fas fa-check-circle"></i> Correct!</strong>
+            {% else %}
+            <strong><i class="fas fa-times-circle"></i> Incorrect.</strong>
+            The correct answer is
+            <strong>{{ ['A', 'B', 'C', 'D'][question.correct_answer] }}. {{ question.options[question.correct_answer] }}</strong>.
+            {% endif %}
+            <div style="margin-top: 0.4rem;">{{ question.explanation }}</div>
+          </div>
+
+          <div class="quiz-nav">
+            <span style="color: var(--text-muted); font-size: 0.85rem;">
+              <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+              Score so far: <strong>{{ session_score }}</strong>
+            </span>
+            {% if next_index is defined and next_index is not none %}
+            <a class="btn-ai {{ 'neet-btn' if course == 'NEET' else '' }}" href="{{ url_for('practice.adaptive_question', course=course, index=next_index) }}">
+              <i class="fas fa-arrow-right"></i> Next Question
+            </a>
+            {% else %}
+            <a class="btn-ai {{ 'neet-btn' if course == 'NEET' else '' }}" href="{{ url_for('practice.adaptive_result', course=course) }}">
+              <i class="fas fa-flag-checkered"></i> View Result
+            </a>
+            {% endif %}
+          </div>
+
+          {% else %}
+          <!-- Interactive view -->
+          <form method="POST" action="{{ url_for('practice.adaptive_answer', course=course, index=index) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="option-list">
+              {% for opt in question.options %}
+              <button type="submit" name="answer" value="{{ loop.index0 }}" class="option-btn">
+                <span class="opt-letter">{{ ['A', 'B', 'C', 'D'][loop.index0] }}</span>
+                <span>{{ opt }}</span>
+              </button>
+              {% endfor %}
+            </div>
+          </form>
+          {% endif %}
+
+        </div>
+
+        {% else %}
+
+        <!-- ============ SETUP VIEW ============ -->
+        <div class="quiz-big-card">
+
+          <h3 class="practice-section-title"><i class="fas fa-crosshairs" style="color: var(--primary-blue);"></i> How the adaptive quiz works</h3>
+          <p class="practice-section-sub">The AI analyses your past quiz performance, finds your weakest subject areas, and builds a fresh quiz that focuses on exactly those concepts.</p>
+
+          <!-- Weak areas -->
+          <div style="margin-bottom: 1.75rem;">
+            <h5 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.6rem;">
+              <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> Weak areas detected for you
+            </h5>
+            {% if weak and weak[0].attempted %}
+            <div class="weak-chips">
+              {% for s in weak %}
+              <span class="weak-chip"><i class="{{ s.icon }}"></i> {{ s.name }} — {{ s.pct }}%</span>
+              {% endfor %}
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">The generated quiz will prioritise these topics and add a few review questions from your stronger areas.</p>
+            {% else %}
+            <p style="color: var(--text-muted); font-size: 0.9rem;">You have no quiz history yet, so the quiz will cover the core {{ course }} subjects evenly. Take a few PDF quizzes first for truly personalised targeting.</p>
+            {% endif %}
+          </div>
+
+          {% if in_progress %}
+          <div class="summary-block" style="margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <span style="font-weight: 700; color: var(--primary-blue);"><i class="fas fa-hourglass-half"></i> You have an adaptive quiz in progress.</span>
+            <a class="btn-ai {{ 'neet-btn' if course == 'NEET' else '' }}" href="{{ url_for('practice.adaptive_question', course=course, index=1) }}">
+              <i class="fas fa-play"></i> Resume Quiz
+            </a>
+          </div>
+          {% endif %}
+
+          <form method="POST" action="{{ url_for('practice.adaptive_quiz_generate', course=course) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="question_count" id="qcount" value="8" />
+
+            <div class="count-selector">
+              <label for="qcount"><i class="fas fa-list-ol"></i> Number of questions:</label>
+              {% for n in [5, 8, 10, 12] %}
+              <button type="button" class="count-pill {{ 'selected' if n == 8 else '' }}" data-value="{{ n }}">{{ n }}</button>
+              {% endfor %}
+            </div>
+
+            <div style="margin-top: 2rem;">
+              <button type="submit" class="btn-ai {{ 'neet-btn' if course == 'NEET' else '' }}" style="font-size: 1rem; padding: 0.9rem 1.8rem;">
+                <i class="fas fa-wand-magic-sparkles"></i> Generate Adaptive Quiz
+              </button>
+            </div>
+          </form>
+
+        </div>
+        {% endif %}
+
+        <footer class="dashboard-footer">
+          <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+        </footer>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const pills = document.querySelectorAll('.count-pill');
+    const qcount = document.getElementById('qcount');
+    pills.forEach(function (p) {
+      p.addEventListener('click', function () {
+        pills.forEach(function (x) { x.classList.remove('selected'); });
+        p.classList.add('selected');
+        qcount.value = p.dataset.value;
+      });
+    });
+  </script>
+
+</body>
+
+</html>

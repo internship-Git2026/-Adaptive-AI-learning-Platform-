@@ -1,0 +1,350 @@
+/* ==============================
+   Notifications Page
+============================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#f8fafc;
+    color:#1f2937;
+}
+
+.notification-container{
+
+    width:100%;
+    max-width:1000px;
+
+    margin:0 auto;
+}
+
+/* Header */
+
+.notification-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+}
+
+.notification-header h1{
+
+    color:#2563eb;
+
+    font-size:32px;
+}
+
+.mark-read-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:10px 20px;
+
+    border-radius:10px;
+
+    transition:.3s;
+}
+
+.mark-read-btn:hover{
+
+    background:#1d4ed8;
+}
+
+/* Filter */
+
+.notification-filter{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-bottom:25px;
+
+    flex-wrap:wrap;
+}
+
+.filter-chip{
+    text-decoration:none;
+
+    color:#1f2937;
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    background:white;
+
+    cursor:pointer;
+
+    box-shadow:0 3px 8px rgba(0,0,0,.08);
+
+    transition:.3s;
+}
+
+.filter-chip:hover{
+
+    background:#2563eb;
+
+    color:white;
+}
+
+/* Notification Card */
+
+.notification-card{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:18px;
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:22px;
+
+    margin-bottom:18px;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+    transition:.3s;
+}
+
+.notification-card:hover{
+
+    transform:translateY(-3px);
+}
+
+/* Icon */
+
+.notification-icon{
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:28px;
+
+    background:#eef4ff;
+}
+
+/* Content */
+
+.notification-content{
+
+    flex:1;
+}
+
+.notification-title{
+
+    font-size:20px;
+
+    font-weight:600;
+
+    margin-bottom:8px;
+}
+
+.notification-message{
+
+    color:#6b7280;
+
+    line-height:1.6;
+}
+
+.notification-time{
+
+    margin-top:12px;
+
+    font-size:13px;
+
+    color:#9ca3af;
+}
+
+/* Empty */
+
+.empty-box{
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:70px;
+
+    text-align:center;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.empty-box h2{
+
+    color:#2563eb;
+
+    margin-bottom:10px;
+}
+
+.empty-box p{
+
+    color:#6b7280;
+}
+
+/* Back Button */
+
+.back-btn{
+
+    display:inline-block;
+
+    margin-bottom:15px;
+
+    text-decoration:none;
+
+    color:#2563eb;
+
+    font-weight:600;
+
+    font-size:15px;
+
+    transition:.3s;
+}
+
+.back-btn:hover{
+
+    color:#1d4ed8;
+
+    transform:translateX(-3px);
+}
+/* Notification Link */
+
+.notification-card-link{
+
+    text-decoration:none;
+
+    color:inherit;
+
+    display:block;
+}
+/* ===========================
+   Notification Type Badge
+=========================== */
+
+.notification-type{
+
+    margin:10px 0;
+}
+
+.type-badge{
+
+    display:inline-block;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+}
+
+/* Quiz */
+
+.type-badge.quiz{
+
+    background:#EEF4FF;
+
+    color:#2563EB;
+}
+
+/* PDF */
+
+.type-badge.pdf{
+
+    background:#ECFDF5;
+
+    color:#16A34A;
+}
+
+/* AI */
+
+.type-badge.ai{
+
+    background:#F3E8FF;
+
+    color:#2563eb;
+}
+
+/* Achievement */
+
+.type-badge.achievement{
+
+    background:#FEF3C7;
+
+    color:#D97706;
+}
+
+/* Course */
+
+.type-badge.course{
+
+    background:#DBEAFE;
+
+    color:#1D4ED8;
+}
+
+/* Payment */
+
+.type-badge.payment{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+}
+
+/* Default */
+
+.type-badge.system{
+
+    background:#F3F4F6;
+
+    color:#374151;
+}
+
+/* Reminder */
+.type-badge.reminder{
+    background:#FFF5F5;
+    color:#E53E3E;
+}
+
+/* Trial */
+.type-badge.trial{
+    background:#FFFBEB;
+    color:#D97706;
+}
+
+/* Progress */
+.type-badge.progress{
+    background:#ECFDF5;
+    color:#059669;
+}

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Trial Quiz · AdaptiveAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='ai_quiz.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='trial.css') }}">
+</head>
+<body>
+
+<div class="container" style="max-width: 750px; margin: 0 auto; position: relative;">
+
+    {% if not is_locked %}
+        <!-- ===== ACTIVE QUIZ SECTION (Q1-Q5) ===== -->
+        <div class="quiz-header">
+            <div>
+                <h1>{{ course_name }} Trial Quiz</h1>
+                <div class="counter" style="margin-top: 0.5rem; font-weight: 600; color: #64748b;">
+                    Question {{ question_no }} of {{ total_questions }}
+                </div>
+            </div>
+            <div class="timer-box">
+                ⏰ <span id="timer">20:00</span>
+            </div>
+        </div>
+
+        <!-- START FORM -->
+        <form action="{{ url_for('trial.submit_answer', question_no=question_no) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="question" style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; color: #0f172a; line-height: 1.4;">
+                {{ question.question }}
+            </div>
+
+            <label class="option">
+                <input
+                    type="radio"
+                    name="answer"
+                    value="0"
+                    required
+                    {% if show_feedback %}disabled{% endif %}
+                    {% if show_feedback and selected_answer == 0 %}checked{% endif %}>
+                <span>A. {{ question.option1 }}</span>
+            </label>
+
+            <label class="option">
+                <input
+                    type="radio"
+                    name="answer"
+                    value="1"
+                    {% if show_feedback %}disabled{% endif %}
+                    {% if show_feedback and selected_answer == 1 %}checked{% endif %}>
+                <span>B. {{ question.option2 }}</span>
+            </label>
+
+            <label class="option">
+                <input
+                    type="radio"
+                    name="answer"
+                    value="2"
+                    {% if show_feedback %}disabled{% endif %}
+                    {% if show_feedback and selected_answer == 2 %}checked{% endif %}>
+                <span>C. {{ question.option3 }}</span>
+            </label>
+
+            <label class="option">
+                <input
+                    type="radio"
+                    name="answer"
+                    value="3"
+                    {% if show_feedback %}disabled{% endif %}
+                    {% if show_feedback and selected_answer == 3 %}checked{% endif %}>
+                <span>D. {{ question.option4 }}</span>
+            </label>
+
+            {% if not show_feedback %}
+                <button class="submit-btn" type="submit" style="margin-top: 1.5rem; width: 100%;">
+                    Submit Answer
+                </button>
+            {% endif %}
+        </form>
+        <!-- END FORM -->
+
+        {% if show_feedback %}
+            <div class="feedback-box" style="margin-top: 2rem; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; background: #fafafa;">
+                {% if is_correct %}
+                    <h2 style="color: #16a34a; font-weight: 800; font-size: 1.4rem; margin-bottom: 0.5rem;"><i class="fas fa-circle-check"></i> Correct Answer</h2>
+                {% else %}
+                    <h2 style="color: #dc2626; font-weight: 800; font-size: 1.4rem; margin-bottom: 0.5rem;"><i class="fas fa-circle-xmark"></i> Wrong Answer</h2>
+                {% endif %}
+
+                <h3 style="font-size: 1rem; font-weight: 700; color: #334155; margin-top: 1rem; margin-bottom: 0.3rem;">Correct Option</h3>
+                <p style="font-weight: 600; color: #0f172a;">
+                    {% if question.correct_answer == 0 %}
+                        A. {{ question.option1 }}
+                    {% elif question.correct_answer == 1 %}
+                        B. {{ question.option2 }}
+                    {% elif question.correct_answer == 2 %}
+                        C. {{ question.option3 }}
+                    {% else %}
+                        D. {{ question.option4 }}
+                    {% endif %}
+                </p>
+
+                <h3 style="font-size: 1rem; font-weight: 700; color: #334155; margin-top: 1rem; margin-bottom: 0.3rem;">Explanation</h3>
+                <p style="color: #64748b; line-height: 1.5; font-size: 0.95rem;">{{ question.explanation }}</p>
+
+                <br>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <a href="{{ url_for('trial.show_question', question_no=next_question_no) }}"
+                       class="submit-btn"
+                       style="display:inline-block; text-decoration:none; text-align:center; flex: 1;">
+                        Next Question <i class="fas fa-arrow-right"></i>
+                    </a>
+                    
+                    {% if question_no == 5 %}
+                        <form action="{{ url_for('trial.result_page', pdf_id=pdf_id) }}" method="POST" style="flex: 1;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button
+                                type="submit"
+                                class="btn-signin-redirect"
+                                style="width: 100%; border: none; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                <i class="fas fa-flag-checkered"></i> Finish &amp; View Score
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <script>
+            let timeLeft = {{ timer }};
+            const timerEl = document.getElementById("timer");
+            const countdown = setInterval(function () {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                timerEl.innerHTML = String(minutes).padStart(2,'0') + ":" + String(seconds).padStart(2,'0');
+
+                if(timeLeft <= 0){
+                    clearInterval(countdown);
+                    alert("⏰ Quiz Time is Over!");
+                    window.location.href = "{{ url_for('trial.result_page', pdf_id=pdf_id) }}";
+                }
+                timeLeft--;
+            }, 1000);
+        </script>
+
+    {% else %}
+        <!-- ===== LOCKED PREMIUM SECTION (Q6-Q10) ===== -->
+        <div class="premium-lock-card">
+            <div class="lock-icon-wrapper">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2>Unlock Remaining Questions</h2>
+            <p>You have reached the free trial limit. Subscribe to unlock the remaining practice questions and full platform performance.</p>
+
+            <div class="unlock-benefits">
+                <div class="benefit-item"><i class="fas fa-circle-check"></i> Remaining Questions</div>
+                <div class="benefit-item"><i class="fas fa-circle-check"></i> Full AI Analysis</div>
+                <div class="benefit-item"><i class="fas fa-circle-check"></i> Unlimited PDF Ingestions</div>
+                <div class="benefit-item"><i class="fas fa-circle-check"></i> Unlimited Quizzes</div>
+            </div>
+
+            <div class="premium-actions">
+                <a href="{{ url_for('signup.signup_page', course='GATE') }}" class="btn-buy"><i class="fas fa-graduation-cap"></i> Buy GATE Plan</a>
+                <a href="{{ url_for('signup.signup_page', course='NEET') }}" class="btn-buy neet-btn"><i class="fas fa-stethoscope"></i> Buy NEET Plan</a>
+                <a href="{{ url_for('signin.signin_page') }}" class="btn-signin-redirect">Sign In</a>
+            </div>
+            
+            <div style="margin-top: 2rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1rem;">Want to see your score on the first 5 questions?</p>
+                <a href="{{ url_for('trial.result_page', pdf_id=pdf_id) }}" class="browse-btn" style="text-decoration: none;">
+                    <i class="fas fa-chart-simple"></i> View Performance Score
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2054 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+background:#f8fafc;
+
+color:#1e293b;
+
+}
+
+/* NAVBAR */
+
+nav:not(.sidebar-menu){
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:18px 8%;
+
+background:white;
+
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+position:sticky;
+
+top:0;
+
+z-index:1000;
+
+}
+
+nav:not(.sidebar-menu) ul{
+
+display:flex;
+list-style:none;
+gap:30px;
+
+}
+
+nav:not(.sidebar-menu) a{
+
+text-decoration:none;
+
+color:#475569;
+
+font-weight:600;
+
+transition:.3s;
+
+}
+
+nav:not(.sidebar-menu) a:hover{
+
+color:#2563eb;
+
+}
+
+
+/* HEADER */
+
+.profile-header{
+
+padding:30px;
+
+}
+
+.profile-card{
+
+display:flex;
+
+align-items:center;
+
+gap:40px;
+
+background:linear-gradient(135deg,#ffffff,#f8fbff);
+
+padding:45px;
+
+border-radius:24px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.profile-image{
+position:relative;
+width:180px;
+height:180px;
+flex-shrink:0;
+}
+
+.profile-image img{
+
+width:180px;
+
+height:180px;
+
+border-radius:50%;
+
+object-fit:cover;
+
+border:8px solid white;
+
+box-shadow:0 15px 35px rgba(37,99,235,.25);
+
+}
+
+.profile-avatar-fallback{
+width:180px;
+height:180px;
+border-radius:50%;
+border:8px solid white;
+box-shadow:0 15px 35px rgba(37,99,235,.25);
+background:linear-gradient(135deg,#dbeafe,#eff6ff);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:4rem;
+color:#2563eb;
+}
+
+.photo-upload-form{
+position:absolute;
+bottom:8px;
+right:8px;
+}
+
+.photo-upload-btn{
+width:40px;
+height:40px;
+border-radius:50%;
+background:#2563eb;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+box-shadow:0 4px 12px rgba(37,99,235,.4);
+transition:all .2s ease;
+font-size:0.9rem;
+border:3px solid #fff;
+}
+
+.photo-upload-btn:hover{
+background:#1d4ed8;
+transform:scale(1.1);
+}
+
+.profile-details{
+
+flex:1;
+
+}
+
+.profile-details h1{
+
+font-size:38px;
+
+margin-bottom:10px;
+
+color:#1e293b;
+
+}
+
+.role{
+
+display:inline-block;
+
+background:#dbeafe;
+
+color:#2563eb;
+
+padding:8px 16px;
+
+border-radius:30px;
+
+font-weight:600;
+
+margin-bottom:20px;
+
+}
+
+.profile-details p{
+
+font-size:17px;
+
+margin:12px 0;
+
+color:#64748b;
+
+}
+
+.profile-details i{
+
+color:#2563eb;
+
+width:25px;
+
+}
+
+.edit-btn{
+
+margin-top:20px;
+
+padding:12px 25px;
+
+background:linear-gradient(135deg,#2563eb,#4f8cff);
+
+color:white;
+
+border:none;
+
+border-radius:10px;
+
+cursor:pointer;
+
+font-size:16px;
+
+transition:.3s;
+
+}
+
+.edit-btn:hover{
+
+background:#1d4ed8;
+
+transform:translateY(-2px);
+
+}
+
+/* STATS */
+
+.stats{
+
+width:90%;
+
+margin:auto;
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+}
+
+.card{
+
+background:white;
+
+padding:30px;
+
+text-align:center;
+
+border-radius:12px;
+
+box-shadow:0 0 10px rgba(0,0,0,.08);
+
+}
+
+.card h3{
+
+color:#666;
+
+margin-bottom:15px;
+
+}
+
+.card h2{
+
+color:#1565c0;
+
+font-size:32px;
+
+}
+
+
+/* MAIN */
+
+.container{
+
+width:90%;
+
+margin:40px auto;
+
+display:grid;
+
+grid-template-columns:2fr 1fr;
+
+gap:30px;
+
+}
+
+/* PERSONAL INFO */
+
+.info-box{
+
+background:white;
+
+padding:30px;
+
+border-radius:12px;
+
+box-shadow:0 0 10px rgba(0,0,0,.08);
+
+}
+
+.info-box h2{
+
+margin-bottom:20px;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+table td{
+
+padding:16px;
+
+border-bottom:1px solid #ddd;
+
+}
+
+table td:first-child{
+
+font-weight:bold;
+
+color:#1565c0;
+
+}
+
+/* ACHIEVEMENTS */
+
+.achievement-box{
+
+background:white;
+
+padding:30px;
+
+border-radius:12px;
+
+box-shadow:0 0 10px rgba(0,0,0,.08);
+
+}
+
+.achievement-box h2{
+
+margin-bottom:25px;
+
+}
+
+.achievement{
+
+display:flex;
+
+align-items:center;
+
+margin-bottom:25px;
+
+}
+
+.achievement i{
+
+font-size:28px;
+
+width:60px;
+
+color:#1976d2;
+
+}
+
+
+/* UPDATE */
+
+.update{
+
+width:90%;
+
+margin:40px auto;
+
+background:white;
+
+padding:30px;
+
+border-radius:12px;
+
+box-shadow:0 0 10px rgba(0,0,0,.08);
+
+}
+
+.update h2{
+
+margin-bottom:20px;
+
+}
+
+form{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:20px;
+
+}
+
+input{
+
+padding:14px;
+
+border:1px solid #ccc;
+
+border-radius:8px;
+
+font-size:16px;
+
+}
+
+.buttons{
+
+grid-column:span 2;
+
+display:flex;
+
+gap:20px;
+
+}
+
+.buttons button{
+
+padding:14px 30px;
+
+border:none;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:16px;
+
+}
+
+.buttons button:first-child{
+
+background:#1565c0;
+
+color:white;
+
+}
+
+.buttons button:last-child{
+
+background:#e3f2fd;
+
+color:#1565c0;
+
+}
+
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+.profile-header{
+
+flex-direction:column;
+
+text-align:center;
+
+}
+
+.profile-right{
+
+margin-left:0;
+
+margin-top:20px;
+
+}
+
+.stats{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.container{
+
+grid-template-columns:1fr;
+
+}
+
+form{
+
+grid-template-columns:1fr;
+
+}
+
+.buttons{
+
+grid-column:span 1;
+
+flex-direction:column;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.stats{
+
+grid-template-columns:1fr;
+
+}
+
+nav:not(.sidebar-menu){
+
+flex-direction:column;
+
+gap:15px;
+
+}
+
+nav:not(.sidebar-menu) ul{
+
+flex-direction:column;
+
+text-align:center;
+
+}
+
+}
+/* ================= LEARNING PROGRESS ================= */
+
+.learning-progress{
+
+margin:35px 30px;
+
+}
+
+.section-title{
+
+font-size:28px;
+
+margin-bottom:25px;
+
+color:#1e293b;
+
+}
+
+.section-title i{
+
+color:#2563eb;
+
+margin-right:10px;
+
+}
+
+.progress-grid{
+
+display:grid;
+
+grid-template-columns:repeat(5,1fr);
+
+gap:20px;
+
+}
+
+.progress-card{
+
+background:linear-gradient(145deg,#ffffff,#f9fbff);
+
+border-radius:22px;
+
+padding:35px 20px;
+
+text-align:center;
+
+box-shadow:0 10px 20px rgba(0,0,0,.08);
+
+transition:.3s;
+
+cursor:pointer;
+
+}
+
+.progress-card:hover{
+
+transform:translateY(-12px) scale(1.03);
+
+box-shadow:0 25px 40px rgba(37,99,235,.25);
+
+}
+
+.progress-card i{
+
+font-size:45px;
+
+color:#2563eb;
+
+margin-bottom:15px;
+
+}
+
+.progress-card h3{
+
+font-size:18px;
+
+margin-bottom:10px;
+
+color:#475569;
+
+}
+
+.progress-card h1{
+
+font-size:42px;
+
+font-weight:700;
+
+color:#2563eb;
+
+margin-bottom:8px;
+
+}
+.progress-card span{
+
+font-size:14px;
+
+color:#64748b;
+
+}
+/* ================= PROFILE CONTENT ================= */
+
+.profile-content{
+
+display:grid;
+
+grid-template-columns:2fr 1fr;
+
+gap:25px;
+
+padding:30px;
+
+}
+
+.activity-card,
+
+.info-card{
+
+background:white;
+
+border-radius:18px;
+
+padding:30px;
+
+box-shadow:0 10px 20px rgba(0,0,0,.08);
+
+}
+
+.activity-card h2,
+
+.info-card h2{
+
+margin-bottom:25px;
+
+color:#1e293b;
+
+}
+
+.activity-card h2 i,
+
+.info-card h2 i{
+
+color:#2563eb;
+
+margin-right:10px;
+
+}
+
+.activity-item{
+
+display:flex;
+
+align-items:center;
+
+gap:18px;
+
+}
+
+.activity-item{
+
+padding:20px;
+
+border-radius:14px;
+
+margin-bottom:15px;
+
+background:#f8fbff;
+
+border-bottom:1px solid #e2e8f0;
+
+}
+
+.activity-item:last-child{
+
+border:none;
+
+}
+
+.activity-item i{
+
+font-size:24px;
+
+color:#2563eb;
+
+background:#dbeafe;
+
+padding:14px;
+
+border-radius:12px;
+
+}
+
+.activity-item h4{
+
+margin-bottom:5px;
+
+color:#1e293b;
+
+}
+
+.activity-item span{
+
+color:#64748b;
+
+font-size:14px;
+
+}
+
+.info-row{
+
+display:flex;
+
+justify-content:space-between;
+
+padding:18px;
+
+background:#f8fbff;
+
+border-radius:12px;
+
+margin-bottom:12px;
+
+border-bottom:1px solid #edf2f7;
+
+}
+
+.info-row:last-child{
+
+border:none;
+
+}
+
+.info-row span{
+
+color:#64748b;
+
+}
+
+.info-row strong{
+
+color:#1e293b;
+
+}
+/* ================= ACCOUNT SETTINGS ================= */
+
+.account-section{
+
+padding:30px;
+
+}
+
+.account-section h2{
+
+margin-bottom:25px;
+
+font-size:28px;
+
+color:#1e293b;
+
+}
+
+.account-section h2 i{
+
+color:#2563eb;
+
+margin-right:10px;
+
+}
+
+.account-grid{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+}
+
+.account-card{
+
+background:linear-gradient(135deg,#2563eb,#4f8cff);
+
+padding:30px;
+
+border-radius:18px;
+
+text-align:center;
+
+box-shadow:0 10px 20px rgba(0,0,0,.08);
+
+transition:.3s;
+
+}
+
+.account-card:hover{
+
+transform:translateY(-8px);
+
+box-shadow:0 15px 35px rgba(37,99,235,.18);
+
+}
+
+.account-card i{
+
+font-size:40px;
+
+color:#2563eb;
+
+margin-bottom:20px;
+
+}
+
+.account-card h3{
+
+margin-bottom:10px;
+
+color:#1e293b;
+
+}
+
+.account-card p{
+
+font-size:14px;
+
+color:#64748b;
+
+margin-bottom:20px;
+
+line-height:1.5;
+
+}
+
+.account-card button{
+
+padding:10px 22px;
+
+background:#2563eb;
+
+color:white;
+
+border:none;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:15px;
+
+transition:.3s;
+
+}
+
+.account-card button:hover{
+
+background:#1d4ed8;
+
+}
+
+.logout i{
+
+color:#ef4444;
+
+}
+
+.logout button{
+
+background:#ef4444;
+
+}
+
+.logout button:hover{
+
+background:#dc2626;
+
+}
+*{
+
+transition:all .3s ease;
+
+}
+/* ================= PROFILE TOP BAR ================= */
+
+.profile-topbar{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:25px;
+
+}
+
+.back-btn{
+
+text-decoration:none;
+
+color:#2563eb;
+
+font-weight:600;
+
+font-size:17px;
+
+display:flex;
+
+align-items:center;
+
+gap:8px;
+
+transition:.3s;
+
+}
+
+.back-btn:hover{
+
+color:#1d4ed8;
+
+}
+
+.settings-btn{
+
+width:52px;
+
+height:52px;
+
+border:none;
+
+border-radius:50%;
+
+background:white;
+
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+cursor:pointer;
+
+font-size:22px;
+
+color:#2563eb;
+
+transition:.3s;
+
+}
+
+.settings-btn:hover{
+
+transform:rotate(90deg);
+
+background:#2563eb;
+
+color:white;
+
+}
+/* ================= SETTINGS PANEL ================= */
+
+.settings-panel{
+
+position:fixed;
+
+top:0;
+
+right:-380px;
+
+width:360px;
+
+height:100vh;
+
+background:white;
+
+box-shadow:-10px 0 30px rgba(0,0,0,.15);
+
+transition: right .35s ease;
+
+z-index:9999;
+
+padding:30px;
+
+overflow-y:auto;
+
+}
+
+.settings-panel.open{
+
+    right: 0;
+
+}
+
+bsettings-toggle:checked ~ .settings-panel{
+
+right:0;
+
+}
+
+.settings-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:30px;
+
+}
+
+.settings-header h2{
+
+font-size:24px;
+
+color:#1e293b;
+
+}
+
+.settings-header i{
+
+color:#2563eb;
+
+}
+
+.close-btn{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:50%;
+
+    border:2px solid #dbeafe;
+
+    background:linear-gradient(145deg,#ffffff,#f4f8ff);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    cursor:pointer;
+
+    transition:.3s ease;
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,.08),
+        inset 0 1px 0 rgba(255,255,255,.9);
+
+}
+
+.close-btn i{
+
+    font-size:24px;
+
+    color:#1e293b;
+
+    transition:.3s ease;
+
+}
+
+.close-btn:hover{
+
+    transform:rotate(90deg) scale(1.05);
+
+    border-color:#2563eb;
+
+    box-shadow:
+        0 15px 35px rgba(37,99,235,.18);
+
+}
+
+.close-btn:hover i{
+
+    color:#2563eb;
+
+}
+
+.close-btn:active{
+
+    transform:scale(.95);
+
+}
+
+/* ================= SETTINGS MENU ================= */
+
+.settings-menu{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:28px;
+
+    margin:25px 0 35px;
+
+}
+/* ================= SETTING CARD ================= */
+
+.setting-card{
+
+    background:#f8fbff;
+
+    border:1px solid #edf3ff;
+
+    border-radius:22px;
+
+    padding:24px 28px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    transition:.3s ease;
+
+    box-shadow:
+        0 8px 30px rgba(37,99,235,.06),
+        0 2px 8px rgba(37,99,235,.04);
+
+}
+
+.setting-card:hover{
+
+    transform:translateY(-4px);
+
+    background:#ffffff;
+
+    box-shadow:
+        0 18px 40px rgba(37,99,235,.12);
+
+}
+/* ================= ICON ================= */
+
+.setting-card h3 i{
+
+    color:#1f2937;
+
+    font-size:28px;
+
+    margin-right:18px;
+
+}
+/* ================= TITLE ================= */
+
+.setting-card h3{
+
+    font-size:21px;
+
+    font-weight:700;
+
+    color:#0f172a;
+
+    display:flex;
+
+    align-items:center;
+
+    margin-bottom:8px;
+
+}
+/* ================= SUBTITLE ================= */
+
+.setting-card p{
+
+    color:#64748b;
+
+    font-size:16px;
+
+    margin-left:46px;
+
+}
+
+/* ================= RIGHT ARROW ================= */
+
+.setting-card>.fa-angle-right{
+
+    font-size:28px;
+
+    color:#0f172a;
+
+    transition:.3s;
+
+}
+
+.setting-card:hover>.fa-angle-right{
+
+    transform:translateX(5px);
+
+}
+
+/* ================= LOGOUT ================= */
+
+.logout-card{
+
+    border:2px solid #ff4d4f;
+
+    background:#fff;
+
+}
+
+.logout-card:hover{
+
+    background:#fff5f5;
+
+    box-shadow:0 18px 35px rgba(239,68,68,.12);
+
+}
+/* ================= LINK ================= */
+
+.logout-link{
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+/* Overlay */
+
+.overlay{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(0,0,0,.35);
+
+opacity:0;
+
+visibility:hidden;
+
+transition:.3s;
+
+z-index:998;
+
+}
+
+bsettings-toggle:checked ~ .overlay{
+
+opacity:1;
+
+visibility:visible;
+
+}
+/* ================= MY COURSES ================= */
+
+.courses-card{
+
+background:white;
+
+padding:30px;
+
+border-radius:18px;
+
+box-shadow:0 10px 20px rgba(0,0,0,.08);
+
+}
+
+.courses-card h2{
+
+margin-bottom:25px;
+
+color:#1e293b;
+
+}
+
+.courses-card h2 i{
+
+color:#2563eb;
+
+margin-right:10px;
+
+}
+
+.course-item{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:20px;
+
+margin-bottom:18px;
+
+background:#f8fbff;
+
+border-radius:14px;
+
+transition:.3s;
+
+}
+
+.course-item:hover{
+
+transform:translateY(-3px);
+
+box-shadow:0 10px 20px rgba(37,99,235,.15);
+
+}
+
+.course-item h3{
+
+margin-bottom:8px;
+
+color:#1e293b;
+
+}
+
+.course-item p{
+
+margin-top:8px;
+
+color:#64748b;
+
+font-size:14px;
+
+}
+
+.course-status{
+
+display:inline-block;
+
+padding:6px 12px;
+
+border-radius:20px;
+
+font-size:13px;
+
+font-weight:600;
+
+}
+
+.purchased{
+
+background:#dcfce7;
+
+color:#15803d;
+
+}
+
+.not-purchased{
+
+background:#fee2e2;
+
+color:#dc2626;
+
+}
+
+.continue-btn{
+
+padding:10px 22px;
+
+background:#2563eb;
+
+color:white;
+
+border:none;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-weight:600;
+
+}
+
+.continue-btn:hover{
+
+background:#1d4ed8;
+
+}
+
+.buy-btn{
+
+padding:10px 22px;
+
+background:#16a34a;
+
+color:white;
+
+border:none;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-weight:600;
+
+}
+
+.buy-btn:hover{
+
+background:#15803d;
+
+}
+
+.add-course-btn{
+
+width:100%;
+
+padding:14px;
+
+margin-top:10px;
+
+background:#dbeafe;
+
+border:2px dashed #2563eb;
+
+border-radius:12px;
+
+color:#2563eb;
+
+font-size:16px;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+.add-course-btn:hover{
+
+background:#2563eb;
+
+color:white;
+
+}
+/* =======================================================
+                    EDIT PROFILE PAGE
+======================================================= */
+
+.edit-profile-container{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:60px 20px;
+
+}
+
+.edit-profile-card{
+
+    width:100%;
+
+    max-width:700px;
+
+    background:#ffffff;
+
+    border-radius:24px;
+
+    padding:40px;
+
+    box-shadow:0 15px 40px rgba(37,99,235,.08);
+
+}
+
+.edit-profile-card h1{
+
+    text-align:center;
+
+    color:#1e3a8a;
+
+    margin-bottom:35px;
+
+    font-size:32px;
+
+}
+
+.edit-profile-card h1 i{
+
+    margin-right:10px;
+
+}
+
+.input-group{
+
+    margin-bottom:22px;
+
+}
+
+.input-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    color:#334155;
+
+}
+
+.input-group input{
+
+    width:100%;
+
+    padding:14px 16px;
+
+    border:2px solid #dbeafe;
+
+    border-radius:12px;
+
+    font-size:16px;
+
+    transition:.3s;
+
+    outline:none;
+
+    box-sizing:border-box;
+
+}
+
+.input-group input:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.10);
+
+}
+
+.button-group{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+    margin-top:35px;
+
+}
+
+.save-btn{
+
+    flex:1;
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:14px;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.save-btn:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+
+}
+
+.cancel-btn{
+
+    flex:1;
+
+    text-align:center;
+
+    background:#f1f5f9;
+
+    color:#334155;
+
+    text-decoration:none;
+
+    border-radius:12px;
+
+    padding:14px;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.cancel-btn:hover{
+
+    background:#e2e8f0;
+
+}
+.setting-link{
+
+    text-decoration:none;
+
+    color:inherit;
+
+    display:block;
+
+}
+
+/* ===========================================
+            ADD COURSE PAGE
+=========================================== */
+
+.add-course-container{
+
+    display:flex;
+
+    justify-content:center;
+
+    padding:50px 20px;
+
+}
+
+.add-course-card{
+
+    width:100%;
+
+    max-width:850px;
+
+    background:#fff;
+
+    border-radius:25px;
+
+    padding:40px;
+
+    box-shadow:0 15px 40px rgba(37,99,235,.08);
+
+}
+
+.add-course-card h1{
+
+    text-align:center;
+
+    color:#2563eb;
+
+    margin-bottom:40px;
+
+}
+
+/* Section */
+
+.owned-course,
+.available-courses{
+
+    margin-top:35px;
+
+}
+
+.owned-course h2,
+.available-courses h2{
+
+    color:#1e293b;
+
+    margin-bottom:20px;
+
+}
+
+/* Course Box */
+
+.course-box{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#f8fbff;
+
+    border:1px solid #dbeafe;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    margin-bottom:20px;
+
+    transition:.3s;
+
+}
+
+.course-box:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 25px rgba(37,99,235,.08);
+
+}
+
+.course-box h3{
+
+    font-size:22px;
+
+    color:#1e293b;
+
+    margin-bottom:8px;
+
+}
+
+.course-box p{
+
+    color:#64748b;
+
+    margin-bottom:10px;
+
+}
+
+/* Badge */
+
+.owned-badge{
+
+    background:#dcfce7;
+
+    color:#15803d;
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+/* Price */
+
+.price{
+
+    color:#2563eb;
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+/* Buy Button */
+
+.buy-btn{
+
+    background:#2563eb;
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:14px 28px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.buy-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+/* Back Button */
+
+.back-profile-btn{
+
+    display:inline-block;
+
+    margin-top:30px;
+
+    text-decoration:none;
+
+    color:#2563eb;
+
+    font-weight:600;
+
+}
+
+/*==================================================
+                RECENT ACTIVITY
+==================================================*/
+
+.activity-card{
+
+    background:#ffffff;
+
+    border-radius:24px;
+
+    padding:32px;
+
+    box-shadow:0 15px 40px rgba(37,99,235,.08);
+
+}
+
+.activity-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:28px;
+
+}
+
+.activity-header h2{
+
+    font-size:28px;
+
+    color:#1e293b;
+
+    font-weight:700;
+
+}
+
+.activity-item{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:18px;
+
+    background:#f8fbff;
+
+    border:1px solid #edf4ff;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    margin-bottom:18px;
+
+    transition:.35s ease;
+
+}
+
+.activity-item:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 12px 28px rgba(37,99,235,.12);
+
+    border-color:#bfdbfe;
+
+}
+
+.activity-icon{
+
+    width:58px;
+
+    height:58px;
+
+    min-width:58px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:22px;
+
+}
+
+/* PDF */
+
+.pdf-color{
+
+    background:#dbeafe;
+
+    color:#2563eb;
+
+}
+
+/* Quiz */
+
+.quiz-color{
+
+    background:#dcfce7;
+
+    color:#16a34a;
+
+}
+
+/* Profile */
+
+.profile-color{
+
+    background:#dbeafe;
+
+    color:#2563eb;
+
+}
+
+/* Course */
+
+.course-color{
+
+    background:#fef3c7;
+
+    color:#d97706;
+
+}
+
+/* Practice */
+
+.practice-color{
+
+    background:#fee2e2;
+
+    color:#dc2626;
+
+}
+
+.default-color{
+
+    background:#e5e7eb;
+
+    color:#64748b;
+
+}
+
+.activity-info{
+
+    flex:1;
+
+}
+
+.activity-info h4{
+
+    font-size:18px;
+
+    color:#0f172a;
+
+    margin-bottom:5px;
+
+    font-weight:700;
+
+}
+
+.activity-info p{
+
+    font-size:15px;
+
+    color:#64748b;
+
+    margin-bottom:10px;
+
+    line-height:1.5;
+
+}
+
+.activity-info span{
+
+    display:inline-block;
+
+    background:#dbeafe;
+
+    color:#2563eb;
+
+    padding:4px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.empty-activity{
+
+    text-align:center;
+
+    padding:60px 20px;
+
+    color:#94a3b8;
+
+}
+
+.empty-activity i{
+
+    font-size:55px;
+
+    margin-bottom:15px;
+
+}

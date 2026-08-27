@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Your Plan · AdaptiveAI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='plans.css') }}">
+</head>
+<body>
+
+  <div class="card">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}" style="padding: 0.8rem; margin-bottom: 1.5rem; border-radius: 8px; background-color: #fef2f2; color: #b91c1c; font-weight: 500; border-left: 4px solid #ef4444; font-size: 0.9rem; text-align: left;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="header">
+      <i class="fa-solid fa-credit-card"></i>
+      <h1>Plan Confirmation</h1>
+      <p>Simulate payment to unlock full access to the platform</p>
+    </div>
+
+    <!-- Active Plan Block -->
+    <div class="plan-summary">
+      <div class="plan-details">
+        <h3 id="display-title">
+          {% if selected_course == 'GATE' %}
+            GATE Preparation Plan
+          {% elif selected_course == 'NEET' %}
+            NEET Preparation Plan
+          {% elif selected_course == 'GATE+NEET' %}
+            GATE + NEET Combo Plan
+          {% else %}
+            Choose a Course Plan
+          {% endif %}
+        </h3>
+        <p id="display-desc">
+          {% if selected_course == 'GATE' %}
+            Adaptive engineering quizzes & analytics
+          {% elif selected_course == 'NEET' %}
+            Complete medical prep question bank
+          {% elif selected_course == 'GATE+NEET' %}
+            Full access to both GATE & NEET suites
+          {% else %}
+            Select your syllabus path below
+          {% endif %}
+        </p>
+      </div>
+      <div class="plan-price" id="display-price">
+        {% if user.payment_plan %}
+          ₹{{ user.payment_plan }}
+        {% else %}
+          --
+        {% endif %}
+      </div>
+    </div>
+
+    <form action="{{ url_for('plans.plans_page') }}" method="POST" id="payment-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="selected_course" id="selected-course-input" value="{{ selected_course or '' }}">
+      
+      <button type="submit" class="proceed-btn" id="proceed-btn" {% if not selected_course %}disabled style="background: #cbd5e1; box-shadow: none;"{% endif %}>
+        <i class="fa-solid fa-circle-check"></i> Proceed & Pay (Simulated)
+      </button>
+    </form>
+
+    <div class="change-plans">
+      <h4>Or select / change your course:</h4>
+      
+      <div class="plan-option {% if selected_course == 'GATE' %}selected{% endif %}" onclick="changeSelection('GATE', 'GATE Preparation Plan', 'Adaptive engineering quizzes & analytics', '1000')">
+        <div>
+          <strong>GATE Prep</strong>
+          <div style="font-size: 0.8rem; color: #64748b;">₹1,000 / Lifetime</div>
+        </div>
+        <i class="fa-solid fa-circle-chevron-right" style="color: #2563eb;"></i>
+      </div>
+
+      <div class="plan-option {% if selected_course == 'NEET' %}selected{% endif %}" onclick="changeSelection('NEET', 'NEET Preparation Plan', 'Complete medical prep question bank', '1000')">
+        <div>
+          <strong>NEET Prep</strong>
+          <div style="font-size: 0.8rem; color: #64748b;">₹1,000 / Lifetime</div>
+        </div>
+        <i class="fa-solid fa-circle-chevron-right" style="color: #16a34a;"></i>
+      </div>
+
+      <div class="plan-option {% if selected_course == 'GATE+NEET' %}selected{% endif %}" onclick="changeSelection('GATE+NEET', 'GATE + NEET Combo Plan', 'Full access to both GATE & NEET suites', '1500')">
+        <div>
+          <strong>GATE + NEET Combo</strong>
+          <div style="font-size: 0.8rem; color: #64748b;">₹1,500 / Lifetime</div>
+        </div>
+        <i class="fa-solid fa-circle-chevron-right" style="color: #2563eb;"></i>
+      </div>
+    </div>
+
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; align-items: center;">
+      <a href="{{ url_for('dashboard.dashboard_page') }}" class="logout-link" style="background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600;">
+        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+      </a>
+      <a href="{{ url_for('main.logout') }}" class="logout-link">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function changeSelection(courseCode, title, desc, price) {
+      // Update displays
+      document.getElementById('display-title').innerText = title;
+      document.getElementById('display-desc').innerText = desc;
+      document.getElementById('display-price').innerText = '₹' + price;
+      
+      // Update hidden input
+      document.getElementById('selected-course-input').value = courseCode;
+      
+      // Enable button
+      const btn = document.getElementById('proceed-btn');
+      btn.disabled = false;
+      btn.style.background = '#2563eb';
+      btn.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.2)';
+
+      // Highlight option card
+      document.querySelectorAll('.plan-option').forEach(card => {
+        card.classList.remove('selected');
+      });
+      // We check if event exists (can be called programmatically or via click)
+      if (window.event) {
+        window.event.currentTarget.classList.add('selected');
+      }
+    }
+  </script>
+</body>
+</html>

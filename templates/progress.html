@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Progress · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='progress.css') }}" />
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Include Sidebar -->
+    {% include 'sidebar.html' %}
+    
+    <!-- Main Content Area -->
+    <main class="app-main">
+      
+      <!-- Welcome/Title Section -->
+      <div class="progress-header">
+        <div>
+          <h1>Progress Analytics</h1>
+          <p class="subtitle">Detailed breakdown of your learning track metrics, study times, and quiz history.</p>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon blue">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Study Time</span>
+            <h3 class="metric-value">{{ study_hours }} hrs</h3>
+            <span class="metric-subtext">Active session duration</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+    <div class="metric-icon red">
+        <i class="fas fa-file-pdf"></i>
+    </div>
+
+    <div class="metric-info">
+        <span class="metric-label">PDF Uploaded</span>
+
+        <h3 class="metric-value">
+            {{ total_pdfs }}
+        </h3>
+
+        <span class="metric-subtext">
+            Total uploaded resources
+        </span>
+    </div>
+</div>
+
+<div class="metric-card">
+    <div class="metric-icon orange">
+        <i class="fas fa-clipboard-check"></i>
+    </div>
+
+    <div class="metric-info">
+        <span class="metric-label">Quizzes Taken</span>
+
+        <h3 class="metric-value">
+            {{ total_quizzes }}
+        </h3>
+
+        <span class="metric-subtext">
+            Completed AI quizzes
+        </span>
+    </div>
+</div>
+
+        <div class="metric-card">
+          <div class="metric-icon green">
+            <i class="fas fa-circle-question"></i>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Questions Solved</span>
+            <h3 class="metric-value">{{ questions_solved }}</h3>
+            <span class="metric-subtext">Across all quiz sessions</span>
+          </div>
+        </div>
+
+        <div class="metric-card animate-pulse">
+          <div class="metric-icon purple">
+            <i class="fas fa-bullseye"></i>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Avg Accuracy</span>
+            <h3 class="metric-value">{{ accuracy }}%</h3>
+            <span class="metric-subtext">Success rate on answers</span>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Graphs Section -->
+      <div class="charts-container">
+        
+        <!-- Chart 1: Study Time (Bar Chart) -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-bar" style="color: var(--primary-blue); margin-right: 0.50rem;"></i> Weekly Study Hours</h3>
+            <span class="chart-legend">Hours per day</span>
+          </div>
+          <div class="bar-chart-wrapper">
+            {% for item in weekly_study_data %}
+            <div class="bar-item">
+              <div class="bar-track">
+                <!-- Cap hours at 4.0 for max scaling, default to small height if 0 -->
+                {% set height_pct = (item.hours / 4.0) * 100 %}
+                {% if height_pct > 100 %}{% set height_pct = 100 %}{% endif %}
+                {% if height_pct == 0 %}{% set height_pct = 2 %}{% endif %}
+                <div class="bar-fill" style="height: {{ height_pct }}%">
+                  <span class="bar-tooltip">{{ item.hours }}h</span>
+                </div>
+              </div>
+              <span class="bar-label">{{ item.day }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Chart 2: Accuracy Trend (Line Graph) -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-line" style="color: #2563eb; margin-right: 0.50rem;"></i> Accuracy Trend</h3>
+            <span class="chart-legend">Last 5 Quizzes (%)</span>
+          </div>
+          <div class="svg-chart-wrapper">
+            <svg viewBox="0 0 500 200" class="svg-line-chart">
+              <!-- Grid lines -->
+              <line x1="50" y1="30" x2="450" y2="30" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="50" y1="80" x2="450" y2="80" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="50" y1="130" x2="450" y2="130" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="50" y1="170" x2="450" y2="170" stroke="#f1f5f9" stroke-width="1.5" />
+              
+              <!-- Labels y-axis -->
+              <text x="25" y="35" font-size="10" fill="#94a3b8">100%</text>
+              <text x="30" y="85" font-size="10" fill="#94a3b8">60%</text>
+              <text x="30" y="135" font-size="10" fill="#94a3b8">30%</text>
+              <text x="35" y="174" font-size="10" fill="#94a3b8">0%</text>
+
+              <!-- Points & Path Calculation -->
+              {% set points = [] %}
+              {% for item in accuracy_trend %}
+                {% set x = 50 + loop.index0 * 100 %}
+                <!-- Map percentage (0-100) to height range (170 down to 30) -->
+                {% set y = 170 - (item.percentage / 100) * 140 %}
+                {% set dummy = points.append(x ~ "," ~ y) %}
+              {% endfor %}
+              
+              <!-- Draw Line Area -->
+              <path d="M 50 170 {% for pt in points %} L {{ pt }} {% endfor %} L {{ 50 + (accuracy_trend|length - 1) * 100 }} 170 Z" fill="url(#blue-gradient)" opacity="0.15" />
+              
+              <!-- Draw Line Path -->
+              <polyline fill="none" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"
+                points="{% for pt in points %}{{ pt }} {% endfor %}" />
+
+              <!-- Circles and tooltips -->
+              {% for item in accuracy_trend %}
+                {% set x = 50 + loop.index0 * 100 %}
+                {% set y = 170 - (item.percentage / 100) * 140 %}
+                <circle cx="{{ x }}" cy="{{ y }}" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="3" class="chart-dot" />
+                <text x="{{ x - 12 }}" y="{{ y - 12 }}" font-size="10" font-weight="700" fill="#1e293b" class="chart-value">{{ item.percentage }}%</text>
+                <!-- x-axis labels -->
+                <text x="{{ x - 18 }}" y="192" font-size="10" font-weight="500" fill="#64748b">{{ item.label }}</text>
+              {% endfor %}
+
+              <!-- Gradients -->
+              <defs>
+                <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#2563eb" />
+                  <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+      
+      <!-- Performance Summary -->
+ 
+<div class="history-section">
+
+    <div class="history-title">
+        <h2>
+            <i class="fas fa-chart-pie"
+               style="color: var(--primary-blue); margin-right:0.5rem;"></i>
+
+            Performance Summary
+        </h2>
+
+        <p>Your overall learning statistics.</p>
+    </div>
+
+    <div class="metrics-grid">
+
+        <div class="metric-card">
+
+            <div class="metric-icon green">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+
+            <div class="metric-info">
+                <span class="metric-label">Highest Score</span>
+
+                <h3 class="metric-value">
+                    {{ highest_score }}%
+                </h3>
+
+            </div>
+
+        </div>
+
+        <div class="metric-card">
+
+            <div class="metric-icon red">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+
+            <div class="metric-info">
+                <span class="metric-label">Lowest Score</span>
+
+                <h3 class="metric-value">
+                    {{ lowest_score }}%
+                </h3>
+
+            </div>
+
+        </div>
+
+        <div class="metric-card">
+
+            <div class="metric-icon purple">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            <div class="metric-info">
+                <span class="metric-label">Correct Answers</span>
+
+                <h3 class="metric-value">
+                    {{ correct_answers }}
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+      <!-- Quiz History Table -->
+      <div class="history-section">
+        <div class="history-title">
+          <h2><i class="fas fa-history" style="color: var(--primary-blue); margin-right: 0.50rem;"></i> Quiz Attempt History</h2>
+          <p>A history of your AI quizzes generated from study materials.</p>
+        </div>
+
+        {% if quiz_history %}
+        <div class="table-container">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Resource PDF</th>
+                <th>Course</th>
+                <th>Attempt Date</th>
+                <th>Score</th>
+                <th>Performance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for quiz in quiz_history %}
+              <tr>
+                <td class="pdf-name">
+                  <i class="fas fa-file-pdf" style="color: #ef4444; margin-right: 0.5rem;"></i>
+                  <strong>{{ quiz.pdf_name }}</strong>
+                </td>
+                <td>
+                  <span class="badge-status {{ quiz.course.lower() }}">{{ quiz.course }}</span>
+                </td>
+                <td class="date-col">{{ quiz.completed_at }}</td>
+                <td class="score-col">{{ quiz.score }} / {{ quiz.total_questions }}</td>
+                <td>
+                  <div class="pct-bar-wrapper">
+                    <div class="pct-bar-track">
+                      {% if quiz.percentage >= 80 %}
+                        {% set color = '#16a34a' %}
+                      {% elif quiz.percentage >= 60 %}
+                        {% set color = '#f59e0b' %}
+                      {% else %}
+                        {% set color = '#ef4444' %}
+                      {% endif %}
+                      <div class="pct-bar-fill" style="width: {{ quiz.percentage }}%; background-color: {{ color }};"></div>
+                    </div>
+                    <span class="pct-text" style="color: {{ color }}">{{ quiz.percentage }}%</span>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <h3>No Quiz Attempts Found</h3>
+          <p>Upload a study PDF in the "Upload PDF" section and trigger your first AI Quiz generation to see your performance logs here!</p>
+          <a href="{{ url_for('my_courses.my_courses_page') }}" class="btn-courses"><i class="fas fa-book-open"></i> Explore My Courses</a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Due for Revision -->
+      <div class="history-section">
+        <div class="history-title">
+          <h2><i class="fas fa-redo-alt" style="color: var(--primary-blue); margin-right: 0.50rem;"></i> Due for Revision</h2>
+          <p>Topics flagged by spaced repetition that need your attention.</p>
+        </div>
+
+        {% if due_revisions %}
+        <div class="table-container">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Topic</th>
+                <th>Mastery</th>
+                <th>Days Overdue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for rev in due_revisions %}
+              <tr>
+                <td>
+                  <span class="badge-status {{ rev.subject.lower() if rev.subject else '' }}">{{ rev.subject }}</span>
+                </td>
+                <td class="pdf-name">
+                  <i class="fas fa-bookmark" style="color: #f59e0b; margin-right: 0.5rem;"></i>
+                  <strong>{{ rev.topic }}</strong>
+                </td>
+                <td>
+                  <div class="pct-bar-wrapper">
+                    <div class="pct-bar-track">
+                      {% if rev.mastery_score >= 70 %}
+                        {% set color = '#16a34a' %}
+                      {% elif rev.mastery_score >= 40 %}
+                        {% set color = '#f59e0b' %}
+                      {% else %}
+                        {% set color = '#ef4444' %}
+                      {% endif %}
+                      <div class="pct-bar-fill" style="width: {{ rev.mastery_score }}%; background-color: {{ color }};"></div>
+                    </div>
+                    <span class="pct-text" style="color: {{ color }}">{{ rev.mastery_score }}%</span>
+                  </div>
+                </td>
+                <td class="score-col">
+                  {% if rev.days_overdue > 0 %}
+                    <span style="color: #ef4444; font-weight: 600;">{{ rev.days_overdue }} day{{ 's' if rev.days_overdue != 1 else '' }}</span>
+                  {% else %}
+                    <span style="color: #16a34a;">Due today</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="fas fa-check-circle"></i>
+          <h3>All Caught Up!</h3>
+          <p>No topics are due for revision. Keep taking quizzes to build your spaced repetition schedule.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Weak Subjects & Recommended Study Playlists (loaded async) -->
+      <div class="history-section" id="weak-areas-section">
+        <div class="history-title">
+          <h2><i class="fas fa-lightbulb" style="color: #f59e0b; margin-right: 0.50rem;"></i> Weak Areas — Recommended Study Playlists</h2>
+          <p>Your weakest {{ user_course }} topics with curated open-access study resources.</p>
+        </div>
+
+        <!-- Static weak subject cards (instant, no YouTube links yet) -->
+        {% if weak_subjects %}
+        <div class="weak-subjects-grid" id="weak-subjects-grid">
+          {% for subj in weak_subjects %}
+          <div class="weak-subject-card" data-key="{{ subj.key }}">
+            <div class="ws-header">
+              <div class="ws-icon">
+                <i class="{{ subj.icon }}"></i>
+              </div>
+              <div class="ws-info">
+                <h4>{{ subj.name }}</h4>
+                <p>{{ subj.description }}</p>
+              </div>
+              <div class="ws-pct {% if subj.pct >= 70 %}ws-good{% elif subj.pct >= 40 %}ws-mid{% else %}ws-low{% endif %}">
+                {{ subj.pct }}%
+              </div>
+            </div>
+            <div class="ws-resources ws-loading" id="ws-res-{{ subj.key }}">
+              <div class="ws-spinner"><i class="fas fa-spinner fa-spin"></i> Finding study videos...</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state" id="weak-empty">
+          <i class="fas fa-star"></i>
+          <h3>No Weak Areas Detected</h3>
+          <p>Take a few quizzes and the system will identify your weak topics with recommended study playlists.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Footer -->
+      <footer class="dashboard-footer">
+        <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <script>
+    // Load weak areas + YouTube resources asynchronously after page load
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('{{ url_for("progress.weak_subjects_api") }}')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.weak_subjects || data.weak_subjects.length === 0) {
+            var grid = document.getElementById('weak-subjects-grid');
+            if (grid) grid.innerHTML = '';
+            return;
+          }
+          data.weak_subjects.forEach(function(subj) {
+            var container = document.getElementById('ws-res-' + subj.key);
+            if (!container) return;
+
+            if (subj.resources && subj.resources.length > 0) {
+              var html = '<h5><i class="fas fa-play-circle"></i> Recommended Study Playlist</h5><ul>';
+              subj.resources.forEach(function(res) {
+                html += '<li><a href="' + res.url + '" target="_blank" rel="noopener noreferrer">'
+                  + '<i class="fas fa-external-link-alt"></i>'
+                  + '<span>' + res.title + '</span>'
+                  + '<span class="ws-source">' + res.source + '</span>'
+                  + '</a></li>';
+              });
+              html += '</ul>';
+              container.innerHTML = html;
+              container.classList.remove('ws-loading');
+            } else {
+              container.innerHTML = '<p class="ws-empty-text"><i class="fas fa-info-circle"></i> No videos found for this topic.</p>';
+              container.classList.remove('ws-loading');
+            }
+          });
+        })
+        .catch(function(err) {
+          console.error('Failed to load study resources:', err);
+          document.querySelectorAll('.ws-loading').forEach(function(el) {
+            el.innerHTML = '<p class="ws-empty-text"><i class="fas fa-info-circle"></i> Could not load study resources.</p>';
+            el.classList.remove('ws-loading');
+          });
+        });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adaptive AI Quiz · {{ course_theme }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='quiz.css') }}">
+</head>
+<body>
+
+  {% if trial_status == 'TRIAL_ENDED' %}
+  <!-- Blocker screen -->
+  <div class="blocker-card">
+    <i class="fas fa-circle-xmark"></i>
+    <h2>Your free trial has ended</h2>
+    <p>Please Sign Up and Purchase a Course to continue exploring our premium AI quiz questions and dashboard metrics.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="{{ url_for('signup.signup_page') }}" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Sign Up
+      </a>
+      <a href="{{ url_for('signin.signin_page') }}" class="btn btn-secondary">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </a>
+    </div>
+    <div style="margin-top: 1.5rem;">
+      <a href="{{ url_for('main.home') }}" class="nav-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </div>
+  </div>
+  {% else %}
+  
+  <!-- Interactive Quiz Container -->
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <div class="quiz-title">
+        <i class="fas fa-brain" style="color: #2563eb;"></i>
+        <span>{{ course_theme }} Adaptive Quiz</span>
+      </div>
+      <div>
+        {% if trial_status == 'FREE_TRIAL_ACTIVE' %}
+          <span class="trial-badge badge-trial"><i class="fas fa-bolt"></i> Free Trial Credit Used</span>
+        {% else %}
+          <span class="trial-badge badge-paid"><i class="fas fa-circle-check"></i> Enrolled Access</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Active Question View -->
+    <div class="quiz-body" id="quiz-body">
+      <div class="question-block">
+        <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 0.3rem;" id="q-counter">Question 1 of 2</div>
+        <div class="question-text" id="q-text">Loading question...</div>
+        
+        <div class="options-list" id="options-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <div class="feedback-box" id="feedback-box">
+        <div class="feedback-title" id="feedback-title">Correct!</div>
+        <div class="feedback-text" id="feedback-desc">Explanation text goes here...</div>
+      </div>
+
+      <button class="next-btn" id="next-btn" style="display: none;" onclick="loadNextQuestion()">Next Question <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    <!-- Score View -->
+    <div class="score-view" id="score-view">
+      <i class="fas fa-medal"></i>
+      <h2>Quiz Completed!</h2>
+      <p id="score-text">You scored 2 out of 2</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem;">
+        {% if user %}
+          <a href="{{ url_for('dashboard.dashboard_page') }}" class="btn btn-primary"><i class="fas fa-home"></i> Go to Dashboard</a>
+        {% else %}
+          <p style="font-size: 0.9rem; color: #ef4444; font-weight: 600; margin-bottom: 0.5rem;"><i class="fas fa-circle-info"></i> Trial utilized. Register to save metrics!</p>
+          <a href="{{ url_for('signup.signup_page') }}" class="btn btn-primary"><i class="fas fa-user-plus"></i> Sign Up & Purchase Course</a>
+        {% endif %}
+        <a href="{{ url_for('main.home') }}" class="nav-btn" style="justify-content: center;"><i class="fas fa-arrow-left"></i> Home Page</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const gateQuestions = [
+      {
+        question: "What is the time complexity of searching an element in a balanced binary search tree (AVL tree) of size n?",
+        options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+        correct: 1,
+        explanation: "In a balanced binary search tree, the height is guaranteed to be O(log n), so search operation takes O(log n) time."
+      },
+      {
+        question: "Which of the following is NOT a valid scheduling algorithm in Operating Systems?",
+        options: ["First Come First Served (FCFS)", "Shortest Job First (SJF)", "Round Robin", "Last In First Out (LIFO)"],
+        correct: 3,
+        explanation: "Operating systems use scheduling algorithms like FCFS, SJF, and Round Robin to schedule processes. LIFO is not a standard process scheduling algorithm."
+      }
+    ];
+
+    const neetQuestions = [
+      {
+        question: "Which cell organelle is known as the powerhouse of the cell?",
+        options: ["Nucleus", "Mitochondria", "Ribosome", "Lysosome"],
+        correct: 1,
+        explanation: "Mitochondria are known as the powerhouse of the cell because they are responsible for producing ATP, the cell's energy currency."
+      },
+      {
+        question: "What is the normal blood pressure range of a healthy adult human?",
+        options: ["120/80 mmHg", "140/90 mmHg", "100/50 mmHg", "80/120 mmHg"],
+        correct: 0,
+        explanation: "The normal blood pressure range for a healthy adult is typically around 120 mmHg systolic and 80 mmHg diastolic (120/80 mmHg)."
+      }
+    ];
+
+    const theme = "{{ course_theme }}";
+    const questions = theme === "NEET" ? neetQuestions : gateQuestions;
+    
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function renderQuestion() {
+      answered = false;
+      const q = questions[currentIndex];
+      
+      document.getElementById('q-counter').innerText = `Question ${currentIndex + 1} of ${questions.length}`;
+      document.getElementById('q-text').innerText = q.question;
+      document.getElementById('feedback-box').style.display = 'none';
+      document.getElementById('next-btn').style.display = 'none';
+      
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+      
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => selectOption(idx, btn);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectOption(selectedIndex, btnEl) {
+      if (answered) return;
+      answered = true;
+      
+      const q = questions[currentIndex];
+      const isCorrect = selectedIndex === q.correct;
+      
+      // Update score
+      if (isCorrect) {
+        score++;
+        btnEl.classList.add('correct');
+        document.getElementById('feedback-title').innerText = "Correct! 🎉";
+        document.getElementById('feedback-title').style.color = "#15803d";
+        document.getElementById('feedback-box').style.borderLeftColor = "#22c55e";
+      } else {
+        btnEl.classList.add('incorrect');
+        // Highlight correct option
+        const options = document.querySelectorAll('.option-btn');
+        options[q.correct].classList.add('correct');
+        document.getElementById('feedback-title').innerText = "Incorrect ❌";
+        document.getElementById('feedback-title').style.color = "#b91c1c";
+        document.getElementById('feedback-box').style.borderLeftColor = "#ef4444";
+      }
+      
+      document.getElementById('feedback-desc').innerText = q.explanation;
+      document.getElementById('feedback-box').style.display = 'block';
+      document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function loadNextQuestion() {
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        renderQuestion();
+      } else {
+        // Show Score Page
+        document.getElementById('quiz-body').style.display = 'none';
+        document.getElementById('score-text').innerText = `You scored ${score} out of ${questions.length}`;
+        document.getElementById('score-view').style.display = 'block';
+      }
+    }
+
+    // Initialize first question on load
+    document.addEventListener("DOMContentLoaded", () => {
+      renderQuestion();
+    });
+  </script>
+  {% endif %}
+
+</body>
+</html>

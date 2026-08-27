@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Result</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='result.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="result-container">
+
+    <a href="{{ url_for('dashboard.dashboard_page') }}" style="color: #2563eb; font-weight: 700; text-decoration: none; display: inline-block; margin-bottom: 1.5rem;">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <!-- Header -->
+    <div class="result-header">
+        <div class="success-icon">
+            <i class="fas fa-circle-check"></i>
+        </div>
+
+        <h1>Quiz Completed Successfully</h1>
+
+        <p>Your quiz has been evaluated and saved.</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+
+        <div class="result-card">
+            <i class="fas fa-star"></i>
+            <h2>{{ score }}/{{ total_questions }}</h2>
+            <span>Score</span>
+        </div>
+
+        <div class="result-card">
+            <i class="fas fa-bullseye"></i>
+            <h2>{{ percentage }}%</h2>
+            <span>Accuracy</span>
+        </div>
+
+        <div class="result-card">
+            <i class="fas fa-check-circle"></i>
+            <h2>{{ score }}</h2>
+            <span>Correct</span>
+        </div>
+
+        <div class="result-card">
+            <i class="fas fa-times-circle"></i>
+            <h2>{{ total_questions - score }}</h2>
+            <span>Wrong</span>
+        </div>
+
+    </div>
+
+    <!-- Performance -->
+    <div class="performance-card">
+
+        <h2>Performance</h2>
+
+        <div class="progress-bar">
+            <div class="progress-fill"
+                 style="width: {{ percentage }}%">
+            </div>
+        </div>
+
+        {% if percentage >= 90 %}
+            <h3 class="excellent">🌟 Outstanding Performance</h3>
+
+        {% elif percentage >= 75 %}
+            <h3 class="excellent">🎯 Excellent Work</h3>
+
+        {% elif percentage >= 60 %}
+            <h3 class="good">👍 Good Job</h3>
+
+        {% elif percentage >= 40 %}
+            <h3 class="average">📘 Keep Practicing</h3>
+
+        {% else %}
+            <h3 class="poor">💪 Don't Give Up</h3>
+        {% endif %}
+
+    </div>
+
+    <!-- AI Recommendation -->
+    <div class="recommend-card">
+
+        <h2>
+            <i class="fas fa-robot"></i>
+            AI Recommendation
+        </h2>
+
+        <ul>
+
+            {% if percentage >= 80 %}
+
+                <li>Continue practicing advanced questions.</li>
+                <li>Revise important concepts once.</li>
+                <li>Attempt another AI Quiz.</li>
+
+            {% elif percentage >= 60 %}
+
+                <li>Review incorrect answers.</li>
+                <li>Revise the uploaded PDF.</li>
+                <li>Practice another quiz.</li>
+
+            {% else %}
+
+                <li>Read the uploaded PDF carefully.</li>
+                <li>Practice basic concepts.</li>
+                <li>Retake this quiz after revision.</li>
+
+            {% endif %}
+
+        </ul>
+
+    </div>
+
+    <!-- Achievement -->
+
+    <div class="achievement-card">
+
+        <h2>
+            <i class="fas fa-trophy"></i>
+            Achievement
+        </h2>
+
+        <div class="achievement-list">
+
+            <div>
+                🔥 Study Session Recorded
+            </div>
+
+            <div>
+                📈 Dashboard Updated
+            </div>
+
+            <div>
+                🧠 AI Quiz Completed
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+
+    <div class="button-group">
+
+        <a href="{{ url_for('dashboard.dashboard_page') }}" class="submit-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+
+        <a href="{{ url_for('pdf_upload.upload_page') }}" class="submit-btn">
+            <i class="fas fa-upload"></i>
+            Upload PDF
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

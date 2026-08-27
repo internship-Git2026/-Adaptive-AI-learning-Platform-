@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Profile · AdaptiveGATE AI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
+
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- Sidebar Menu Inclusion -->
+    {% include 'sidebar.html' %}
+
+    <main class="app-main">
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-flash {{ category }}">
+                        <i class="fas fa-circle-info"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="edit-profile-container">
+
+            <div class="edit-profile-card">
+
+                <h1>
+                    <i class="fa-solid fa-user-pen"></i>
+                    Edit Profile
+                </h1>
+
+                <form method="POST">
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" value="{{ user.name }}" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" name="email" value="{{ user.email }}" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Phone Number</label>
+                        <input type="text" name="phone" value="{{ user.phone }}">
+                    </div>
+
+                    <div class="input-group">
+                        <label>College</label>
+                        <input type="text" name="college" value="{{ user.college }}">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Department</label>
+                        <input type="text" name="department" value="{{ user.department }}">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Year</label>
+                        <input type="text" name="year" value="{{ user.year }}">
+                    </div>
+
+                    <div class="button-group">
+
+                        <button type="submit" class="save-btn">
+                            Save Changes
+                        </button>
+
+                        <a href="{{ url_for('profile.profile_page') }}" class="cancel-btn">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer" style="text-align: center; padding: 2rem 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: auto;">
+            <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+        </footer>
+
+    </main>
+</div>
+
+<script>
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        document.getElementById('appSidebar').classList.add('open');
+        document.getElementById('sidebarBackdrop').classList.add('active');
+    });
+    document.getElementById('sidebarBackdrop')?.addEventListener('click', () => {
+        document.getElementById('appSidebar').classList.remove('open');
+        document.getElementById('sidebarBackdrop').classList.remove('active');
+    });
+</script>
+
+</body>
+
+</html>

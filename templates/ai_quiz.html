@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AdaptiveGATE AI Quiz</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='ai_quiz.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="quiz-header">
+
+    <div>
+
+        <h1>{{ course_name }} AI Quiz</h1>
+
+        <div class="counter">
+
+            Question {{ question_no }} of {{ total_questions }}
+
+        </div>
+
+    </div>
+
+    <div class="timer-box">
+
+        ⏰ <span id="timer">20:00</span>
+
+    </div>
+
+</div>
+
+    <!-- START FORM -->
+    <form action="{{ url_for('ai_quiz.submit_answer', question_id=question.id) }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="question">
+
+            {{ question.question }}
+
+        </div>
+
+        <label class="option">
+
+            <input
+                type="radio"
+                name="answer"
+                value="0"
+                required
+                {% if show_feedback %}disabled{% endif %}>
+  
+                <span>A. {{ question.option1 }}</span>
+
+        </label>
+
+        <label class="option">
+
+            <input
+               type="radio"
+               name="answer"
+               value="1"
+               {% if show_feedback %}disabled{% endif %}>
+
+            <span>B. {{ question.option2 }}</span>
+
+        </label>
+
+        <label class="option">
+
+            <input
+               type="radio"
+               name="answer"
+               value="2"
+               {% if show_feedback %}disabled{% endif %}>
+
+            <span>C. {{ question.option3 }}</span>
+
+        </label>
+
+        <label class="option">
+
+            <input
+               type="radio"
+               name="answer"
+               value="3"
+               {% if show_feedback %}disabled{% endif %}>
+
+            <span>D. {{ question.option4 }}</span>
+
+        </label>
+
+        {% if not show_feedback %}
+
+<button
+    class="submit-btn"
+    type="submit">
+
+    Submit Answer
+
+</button>
+
+{% endif %}
+
+    </form>
+    <!-- END FORM -->
+
+    {% if show_feedback %}
+
+    <div class="feedback-box">
+
+        {% if is_correct %}
+
+            <h2 style="color:green;">✅ Correct Answer</h2>
+
+        {% else %}
+
+            <h2 style="color:red;">❌ Wrong Answer</h2>
+
+        {% endif %}
+
+        <h3>Correct Answer</h3>
+
+        <p>
+
+            {% if question.correct_answer == 0 %}
+                A. {{ question.option1 }}
+            {% elif question.correct_answer == 1 %}
+                B. {{ question.option2 }}
+            {% elif question.correct_answer == 2 %}
+                C. {{ question.option3 }}
+            {% else %}
+                D. {{ question.option4 }}
+            {% endif %}
+
+        </p>
+
+        <h3>Explanation</h3>
+
+        <p>{{ question.explanation }}</p>
+
+        <br>
+
+        {% if next_question %}
+
+        <a href="{{ url_for('ai_quiz.show_question', question_id=next_question.id) }}"
+           class="submit-btn"
+           style="display:inline-block;text-decoration:none;text-align:center;">
+
+            Next Question →
+
+        </a>
+
+        {% else %}
+
+        <form action="{{ url_for('ai_quiz.result', pdf_id=pdf_id) }}" method="POST" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button
+                type="submit"
+                class="submit-btn"
+                style="display:inline-block;border:none;cursor:pointer;">
+                Finish Quiz
+            </button>
+        </form>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+
+let timeLeft = {{ timer }};
+
+const timer = document.getElementById("timer");
+
+const timerBox = document.querySelector(".timer-box");
+
+const countdown = setInterval(function () {
+
+    let minutes = Math.floor(timeLeft / 60);
+
+    let seconds = timeLeft % 60;
+
+    timer.innerHTML =
+        String(minutes).padStart(2,'0')
+        + ":" +
+        String(seconds).padStart(2,'0');
+
+    if(timeLeft <= 300){
+
+        timerBox.classList.add("timer-warning");
+
+    }
+
+    if(timeLeft <= 60){
+
+        timerBox.classList.remove("timer-warning");
+
+        timerBox.classList.add("timer-danger");
+
+    }
+
+    if(timeLeft <= 0){
+
+        clearInterval(countdown);
+
+        alert("⏰ Quiz Time is Over!");
+
+        window.location.href =
+        "{{ url_for('ai_quiz.result', pdf_id=pdf_id) }}";
+    }
+
+    timeLeft--;
+
+},1000);
+
+</script>
+
+</body>
+
+</html>

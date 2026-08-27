@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdaptiveGATE AI - Profile</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- Sidebar Menu Inclusion -->
+    {% include 'sidebar.html' %}
+
+    <main class="app-main">
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-flash {{ category }}">
+                        <i class="fas fa-circle-info"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- ================= PROFILE HEADER ================= -->
+
+        <section class="profile-header">
+
+            <!-- Top Bar -->
+            <div class="profile-topbar">
+
+                <h2 style="font-size: 1.75rem; font-weight: 800; color: var(--ink);">My Account</h2>
+
+                <button id="openSettings" class="settings-btn">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+
+            </div>
+
+            <div class="profile-card">
+
+                <div class="profile-image">
+                    <img src="{{ url_for('profile.serve_photo', user_id=user.id) }}" alt="Profile"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="profile-avatar-fallback" style="display:none;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <form method="POST" action="{{ url_for('profile.upload_photo') }}" enctype="multipart/form-data" class="photo-upload-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <label for="photo-input" class="photo-upload-btn" title="Change photo">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="photo-input" name="photo" accept="image/*" style="display:none;" onchange="this.form.submit();">
+                    </form>
+                </div>
+
+                <div class="profile-details">
+
+                    <h1>{{ fullname }}</h1>
+
+                    <span class="role">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        B.Tech Information Technology
+                    </span>
+
+                    <p>
+                        <i class="fa-solid fa-building-columns"></i>
+                        {{ college }}
+                    </p>
+
+                    <p>
+                        <i class="fa-solid fa-envelope"></i>
+                        {{ email }}
+                    </p>
+
+                    <p>
+                        <i class="fa-solid fa-phone"></i>
+                        {{ phone }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= LEARNING PROGRESS ================= -->
+
+        <section class="learning-progress">
+
+            <h2 class="section-title">
+                <i class="fa-solid fa-chart-line"></i>
+                Learning Progress
+            </h2>
+
+            <div class="progress-grid">
+
+                <div class="progress-card">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <h3>Accuracy</h3>
+                    <h1>{{ accuracy }}%</h1>
+                    <span>Excellent Performance</span>
+                </div>
+
+                <div class="progress-card">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <h3>Questions Solved</h3>
+                    <h1>{{ questions_solved }}</h1>
+                    <span>+25 this week</span>
+                </div>
+
+                <div class="progress-card">
+                    <i class="fa-solid fa-clock"></i>
+                    <h3>Study Hours</h3>
+                    <h1>{{ study_hours }}</h1>
+                    <span>Hours Completed</span>
+                </div>
+
+                <div class="progress-card">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <h3>PDF Uploaded</h3>
+                    <h1>{{ pdfs_uploaded }}</h1>
+                    <span>Study Materials</span>
+                </div>
+
+                <div class="progress-card">
+                    <i class="fa-solid fa-robot"></i>
+                    <h3>AI Quizzes</h3>
+                    <h1>{{ ai_quizzes }}</h1>
+                    <span>Generated Successfully</span>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= AI DOUBT SOLVER STATS ================= -->
+        <section class="learning-progress" style="margin-top: 15px;">
+            <h2 class="section-title">
+                <i class="fa-solid fa-question-circle"></i>
+                AI Doubt Solver Analytics
+            </h2>
+            <div class="progress-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="progress-card">
+                    <i class="fa-solid fa-comment-dots" style="color: #2563eb;"></i>
+                    <h3>Questions Asked</h3>
+                    <h1>{{ questions_asked }}</h1>
+                    <span>Total Doubts Solved</span>
+                </div>
+                <div class="progress-card">
+                    <i class="fa-solid fa-graduation-cap" style="color: #2563eb;"></i>
+                    <h3>Most Asked Subject</h3>
+                    <h1 style="font-size: 1.25rem; margin: 15px 0; min-height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 800; line-height: 1.3;">{{ most_asked_subject }}</h1>
+                    <span>Primary Focus</span>
+                </div>
+                <div class="progress-card">
+                    <i class="fa-solid fa-file-pdf" style="color: #1d4ed8;"></i>
+                    <h3>Most Viewed PDF</h3>
+                    <h1 style="font-size: 0.95rem; margin: 15px 0; min-height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 800; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;" title="{{ most_viewed_pdf }}">{{ most_viewed_pdf }}</h1>
+                    <span>Frequently Cited Reference</span>
+                </div>
+                <div class="progress-card">
+                    <i class="fa-solid fa-chart-line" style="color: #10b981;"></i>
+                    <h3>Learning Trend</h3>
+                    <h1 style="font-size: 1.15rem; margin: 15px 0; min-height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 800; line-height: 1.3;">{{ learning_trend }}</h1>
+                    <span>Recent Activity Level</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PROFILE CONTENT ================= -->
+
+        <section class="profile-content">
+
+            <!-- Recent Activity -->
+            <div class="activity-card">
+
+                <div class="activity-header">
+
+                    <h2>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        Recent Activity
+                    </h2>
+
+                </div>
+
+                {% if recent_activity %}
+
+                    {% for activity in recent_activity %}
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon {{ activity.color }}">
+                            <i class="fa-solid {{ activity.icon }}"></i>
+                        </div>
+
+                        <div class="activity-info">
+
+                            <h4>{{ activity.title }}</h4>
+
+                            <p>{{ activity.description }}</p>
+
+                            <span>{{ activity.time }}</span>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-activity">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>No recent activities yet.</p>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer" style="text-align: center; padding: 2rem 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: auto;">
+            <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+        </footer>
+
+    </main>
+</div>
+
+<div id="settingsContainer"></div>
+
+<script src="{{ url_for('static', filename='settings.js') }}"></script>
+
+<script>
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        document.getElementById('appSidebar').classList.add('open');
+        document.getElementById('sidebarBackdrop').classList.add('active');
+    });
+    document.getElementById('sidebarBackdrop')?.addEventListener('click', () => {
+        document.getElementById('appSidebar').classList.remove('open');
+        document.getElementById('sidebarBackdrop').classList.remove('active');
+    });
+</script>
+
+</body>
+</html>

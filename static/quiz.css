@@ -1,0 +1,145 @@
+/* quiz.css */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.quiz-container {
+  max-width: 650px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 2rem;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  color: #1e293b;
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid #eff6ff;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+.quiz-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.trial-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+.badge-trial { background: #fee2e2; color: #ef4444; }
+.badge-paid { background: #dcfce7; color: #15803d; }
+
+.question-block { margin-bottom: 1.5rem; }
+.question-text { font-size: 1.15rem; font-weight: 600; color: #1e293b; margin-bottom: 1.2rem; line-height: 1.5; }
+
+.options-list { display: flex; flex-direction: column; gap: 0.8rem; }
+.option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.2rem;
+  border: 1.5px solid #dbeafe;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+}
+.option-btn:hover { border-color: #2563eb; background: #f8fafc; }
+.option-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; font-weight: 600; }
+.option-btn.incorrect { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; font-weight: 600; }
+
+.feedback-box {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border-left: 4px solid #2563eb;
+  display: none;
+}
+.feedback-title { font-weight: 700; color: #1e293b; margin-bottom: 0.3rem; }
+.feedback-text { font-size: 0.92rem; color: #64748b; line-height: 1.5; }
+
+.next-btn {
+  display: block;
+  width: 100%;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+.next-btn:hover { background: #1d4ed8; }
+
+.score-view { text-align: center; display: none; }
+.score-view i { font-size: 4rem; color: #10b981; margin-bottom: 1rem; }
+.score-view h2 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; }
+.score-view p { color: #64748b; margin-bottom: 1.5rem; }
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  color: #2563eb;
+  font-size: 0.95rem;
+  margin-top: 1rem;
+}
+
+/* Blocker Styles */
+.blocker-card {
+  max-width: 500px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 2rem;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+.blocker-card i { font-size: 4rem; color: #ef4444; margin-bottom: 1.5rem; }
+.blocker-card h2 { font-size: 1.8rem; font-weight: 800; color: #1e293b; margin-bottom: 0.8rem; }
+.blocker-card p { color: #64748b; line-height: 1.6; margin-bottom: 2rem; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.8rem;
+  border-radius: 30px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+.btn-primary { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-secondary { background: #eff6ff; color: #334155; }
+.btn-secondary:hover { background: #dbeafe; }

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adaptive Learning · Learn smarter, rank higher</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='Main_page.css') }}" />
+</head>
+<body>
+
+
+  <div class="card">
+
+    <!-- ========== NAVBAR ========== -->
+    <div class="navbar">
+      <div class="logo">
+        <i class="fas fa-brain"></i>
+        <span>Adaptive Learning</span>
+      </div>
+      <div class="nav-actions">
+        {% if user and user.payment_status == 'PAID' %}
+          <a href="{{ url_for('dashboard.dashboard_page') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('my_courses.my_courses_page') }}" class="nav-link">My Courses</a>
+          <a href="{{ url_for('profile.profile_page') }}" class="nav-link">Profile</a>
+          <a href="{{ url_for('main.logout') }}" class="btn-outline" style="text-decoration: none; cursor: pointer;">Sign Out</a>
+        {% else %}
+        
+          <a href="#try-gate" class="nav-link">Try GATE</a>
+          <a href="#try-neet" class="nav-link">Try NEET</a>
+          <a href="{{ url_for('signin.signin_page') }}" class="nav-link">Login</a>
+          <a href="{{ url_for('signup.signup_page') }}" class="btn-outline" style="text-decoration: none; cursor: pointer;">Sign Up</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- ========== HERO ========== -->
+    <div class="hero">
+      <div class="hero-left">
+        <div class="badge">
+          <i class="fas fa-robot"></i> Learn smarter, rank higher.
+        </div>
+        <h1>Adaptive Learning <span>that fits</span> your goals.</h1>
+        <p>
+          Generates custom practice quizzes, pinpoints your weak spots, and builds simulated exams for top competitive exams.
+        </p>
+        <div class="hero-actions">
+          {% if user and user.payment_status == 'PAID' %}
+            <a href="{{ url_for('dashboard.dashboard_page') }}" class="btn-primary">
+              Open dashboard <i class="fas fa-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('signup.signup_page') }}" class="btn-primary">
+              Get Started <i class="fas fa-arrow-right"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="ai-dashboard-card animate-slide-in-right">
+          <div class="dashboard-header">
+            <div class="dashboard-title">
+              <i class="fas fa-brain"></i>
+              <span>AI Performance</span>
+            </div>
+            <span class="pulse-indicator"></span>
+          </div>
+          
+          <div class="dashboard-main-stat">
+            <div class="stat-circle">
+              <svg class="progress-ring" width="70" height="70">
+                <circle class="progress-ring__circle-bg" stroke="#f1f5f9" stroke-width="5" fill="transparent" r="28" cx="35" cy="35"/>
+                <circle class="progress-ring__circle" stroke="#3b82f6" stroke-width="5" fill="transparent" r="28" cx="35" cy="35" stroke-dasharray="175.93" stroke-dashoffset="10.55"/>
+              </svg>
+              <div class="circle-val">94%</div>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Accuracy Lift</span>
+              <span class="stat-desc">Today's target achieved</span>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dash-item">
+              <div class="dash-item-icon accent-red">
+                <i class="fas fa-triangle-exclamation"></i>
+              </div>
+              <div class="dash-item-details">
+                <span class="dash-item-label">Weakest Subject</span>
+                <span class="dash-item-val">Engineering Math</span>
+              </div>
+            </div>
+            
+            <div class="dash-item">
+              <div class="dash-item-icon accent-green">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="dash-item-details">
+                <span class="dash-item-label">Today's Quiz</span>
+                <span class="dash-item-val text-green">Completed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-footer">
+            <div class="rank-prediction">
+              <i class="fas fa-trophy text-gold"></i>
+              <div>
+                <span class="rank-label">AIR Prediction</span>
+                <span class="rank-val">AIR 12</span>
+              </div>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-label">
+                <span>Completion</span>
+                <span>85%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 85%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== COURSE PLAN SECTIONS ========== -->
+    <h2 class="section-title">Choose Your Prep Path</h2>
+    <div class="courses-row">
+      
+      <!-- GATE CARD -->
+      <div class="course-split-card" id="try-gate">
+        <div class="icon-wrapper gate-icon-bg">
+          <i class="fas fa-microchip gate-icon"></i>
+        </div>
+        <h2>GATE Prep</h2>
+        <p>
+          Master the Graduate Aptitude Test in Engineering with real-time adaptive quiz generation, deep weak-area analysis, and automated formula cards.
+        </p>
+        <div class="price-tag">
+          ₹1,000 <span>/ Lifetime access</span>
+        </div>
+        {% if user and user.payment_status == 'PAID' %}
+          <a href="{{ url_for('practice.adaptive_quiz', course='GATE') }}" class="btn-primary btn-gate-quiz">
+            <i class="fas fa-bolt"></i> Master GATE Quiz
+          </a>
+        {% else %}
+          <a href="{{ url_for('trial.start_gate') }}" class="btn-primary btn-gate-quiz start-trial-btn" data-course="GATE">
+            <i class="fas fa-bolt"></i> Try GATE AI Quiz
+          </a>
+        {% endif %}
+      </div>
+
+      <!-- NEET CARD -->
+      <div class="course-split-card" id="try-neet">
+        <div class="icon-wrapper neet-icon-bg">
+          <i class="fas fa-stethoscope neet-icon"></i>
+        </div>
+        <h2>NEET Prep</h2>
+        <p>
+          Conquer the National Eligibility cum Entrance Test. Includes thousands of interactive questions on Biology, Chemistry, and Physics with instant solutions.
+        </p>
+        <div class="price-tag">
+          ₹1,000 <span>/ Lifetime access</span>
+        </div>
+        {% if user and user.payment_status == 'PAID' %}
+          <a href="{{ url_for('practice.adaptive_quiz', course='NEET') }}" class="btn-primary btn-neet-quiz">
+            <i class="fas fa-bolt"></i> Master NEET Quiz
+          </a>
+        {% else %}
+          <a href="{{ url_for('trial.start_neet') }}" class="btn-primary btn-neet-quiz start-trial-btn" data-course="NEET">
+            <i class="fas fa-bolt"></i> Try NEET AI Quiz
+          </a>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- ========== WHY CHOOSE ADAPTIVE AI SECTION ========== -->
+    <h2 class="section-title">Why Choose Adaptive Learning?</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Adaptive AI Quiz</h3>
+        <p>Personalized quizzes generated based on your strengths and weaknesses.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <h3>Smart PDF Analysis</h3>
+        <p>Upload your study material and instantly generate questions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Progress Tracking</h3>
+        <p>Track your learning journey, quiz performance, and improvement over time.</p>
+      </div>
+    </div>
+
+    <!-- ========== STATS ROW ========== -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👨‍🎓</div>
+        <div class="stat-value" data-target="50" data-suffix="K+">0</div>
+        <div class="stat-label">Students</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📄</div>
+        <div class="stat-value" data-target="2.4" data-decimals="1" data-suffix="M">0</div>
+        <div class="stat-label">Questions Solved</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-value" data-target="94" data-suffix="%">0</div>
+        <div class="stat-label">Accuracy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-value" data-target="12" data-prefix="AIR ">0</div>
+        <div class="stat-label">Best Prediction</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== FLOATING AI ASSISTANT ========== -->
+  <div class="floating-ai-container">
+    <button class="floating-ai-btn" id="ai-assistant-btn" title="AI Assistant">
+      <i class="fas fa-robot"></i>
+    </button>
+    
+    <div class="floating-ai-popup" id="ai-assistant-popup">
+      <div class="popup-header">
+        <div class="popup-header-title">
+          <i class="fas fa-robot"></i>
+          <span>AI Assistant</span>
+        </div>
+        <button class="popup-close-btn" id="ai-assistant-close"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="popup-body">
+        <div class="popup-greeting">Hi 👋</div>
+        <div class="popup-prompt">How can Adaptive Learning help you today?</div>
+        <div class="popup-options">
+          <a href="#try-gate" class="popup-option-btn" id="ai-opt-gate"><i class="fas fa-microchip text-blue"></i> Choose GATE</a>
+          <a href="#try-neet" class="popup-option-btn" id="ai-opt-neet"><i class="fas fa-stethoscope text-green"></i> Choose NEET</a>
+          <a href="{{ url_for('pdf_upload.upload_page') }}" class="popup-option-btn"><i class="fas fa-file-pdf text-red"></i> Upload PDF</a>
+          <a href="{{ url_for('practice.ask_ai') }}" class="popup-option-btn"><i class="fas fa-brain text-purple"></i> Ask AI</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Floating AI Popup toggle
+    const aiBtn = document.getElementById('ai-assistant-btn');
+    const aiPopup = document.getElementById('ai-assistant-popup');
+    const aiClose = document.getElementById('ai-assistant-close');
+    const aiOptGate = document.getElementById('ai-opt-gate');
+    const aiOptNeet = document.getElementById('ai-opt-neet');
+
+    function toggleAIAssistant() {
+      aiPopup.classList.toggle('active');
+    }
+
+    if (aiBtn) {
+      aiBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleAIAssistant();
+      });
+    }
+
+    if (aiClose) {
+      aiClose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        aiPopup.classList.remove('active');
+      });
+    }
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (aiPopup && aiPopup.classList.contains('active')) {
+        if (!aiPopup.contains(e.target) && e.target !== aiBtn && !aiBtn.contains(e.target)) {
+          aiPopup.classList.remove('active');
+        }
+      }
+    });
+
+    // Option click close & smooth scroll
+    [aiOptGate, aiOptNeet].forEach(link => {
+      if (link) {
+        link.addEventListener('click', (e) => {
+          aiPopup.classList.remove('active');
+          const targetId = link.getAttribute('href');
+          if (targetId.startsWith('#')) {
+            e.preventDefault();
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: 'smooth' });
+            }
+          }
+        });
+      }
+    });
+
+    // Count Up Animation
+    function initCountUp() {
+      const statsValues = document.querySelectorAll('.stat-value');
+      
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const targetEl = entry.target;
+            const target = parseFloat(targetEl.getAttribute('data-target'));
+            const suffix = targetEl.getAttribute('data-suffix') || '';
+            const prefix = targetEl.getAttribute('data-prefix') || '';
+            const decimals = parseInt(targetEl.getAttribute('data-decimals') || '0');
+            
+            let start = 0;
+            const duration = 1500; // ms
+            const startTime = performance.now();
+
+            function updateNumber(currentTime) {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              
+              // Ease out quad
+              const easeProgress = progress * (2 - progress);
+              
+              const currentValue = start + (target - start) * easeProgress;
+              targetEl.textContent = prefix + currentValue.toFixed(decimals) + suffix;
+
+              if (progress < 1) {
+                requestAnimationFrame(updateNumber);
+              } else {
+                targetEl.textContent = prefix + target.toFixed(decimals) + suffix;
+              }
+            }
+
+            requestAnimationFrame(updateNumber);
+            observer.unobserve(targetEl);
+          }
+        });
+      }, observerOptions);
+
+      statsValues.forEach(el => observer.observe(el));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initCountUp();
+
+      // Stable device fingerprint so a cleared trial cookie can't grant a new trial
+      function getDeviceFingerprint() {
+        let cached = localStorage.getItem('device_fp');
+        if (cached) return cached;
+        const parts = [];
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          ctx.textBaseline = 'top';
+          ctx.font = '14px Arial';
+          ctx.fillStyle = '#f60';
+          ctx.fillRect(125, 1, 62, 20);
+          ctx.fillStyle = '#069';
+          ctx.fillText('fp-check', 2, 15);
+          parts.push(canvas.toDataURL());
+        } catch (err) {}
+        parts.push(navigator.userAgent || '');
+        parts.push(navigator.language || '');
+        parts.push(String(screen.width) + 'x' + String(screen.height) + 'x' + String(screen.colorDepth));
+        try { parts.push(Intl.DateTimeFormat().resolvedOptions().timeZone || ''); } catch (err) {}
+        parts.push(String(navigator.hardwareConcurrency || ''));
+        const raw = parts.join('|');
+        let h1 = 5381;
+        for (let i = 0; i < raw.length; i++) {
+          h1 = ((h1 << 5) + h1) ^ raw.charCodeAt(i);
+        }
+        const fp = 'fp_' + (h1 >>> 0).toString(36);
+        try { localStorage.setItem('device_fp', fp); } catch (err) {}
+        return fp;
+      }
+
+      // Check localStorage to sync or redirect
+      const trialId = localStorage.getItem('trial_id');
+      const browserToken = localStorage.getItem('browser_token');
+
+      // Intercept Try buttons: resume an active trial or start one bound to this device
+      const trialButtons = document.querySelectorAll('.start-trial-btn');
+      trialButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const href = btn.getAttribute('href');
+          if (!href) return;
+          e.preventDefault();
+          if (trialId) {
+            window.location.href = '/trial';
+            return;
+          }
+          const fp = getDeviceFingerprint();
+          const sep = href.indexOf('?') === -1 ? '?' : '&';
+          window.location.href = href + sep + 'fp=' + encodeURIComponent(fp);
+        });
+      });
+
+      // Restore session if cookie cleared but LocalStorage exists
+      const hasCookie = document.cookie.split(';').some(item => item.trim().startsWith('trial_id='));
+      if (trialId && browserToken && !hasCookie) {
+        fetch(`/trial/restore?trial_id=${trialId}&browser_token=${browserToken}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              console.log('Free trial session cookie restored.');
+            }
+          });
+      }
+    });
+  </script>
+
+
+</body>
+</html>

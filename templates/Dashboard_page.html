@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Adaptive Learning</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='Dashboard_page.css') }}" />
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Sidebar Menu Inclusion -->
+    {% include 'sidebar.html' %}
+    
+    <!-- Main Dashboard Body -->
+    <main class="app-main">
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert-flash {{ category }}">
+              <i class="fas fa-circle-info"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- ===== WELCOME SECTION ===== -->
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h1>{{ greeting }}, {{ user_name }} 👋</h1>
+
+<p>Continue learning and track your progress across your enrolled courses.</p>
+    </div>
+        <div class="welcome-badges">
+          <span class="badge-status-premium">
+<i class="fas fa-circle-check"></i>
+
+{% if selected_course %}
+    Enrolled: {{ selected_course }}
+{% else %}
+    No Course Enrolled
+{% endif %}
+          </span>
+          <span class="badge-paid">
+            <i class="fas fa-credit-card"></i> {{ badge_status }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ===== STATS CARDS GRID ===== -->
+      <div class="stats-grid">
+        <!-- Card 1: Study Hours -->
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ study_hours }} hrs</h3>
+            <p>Study Hours</p>
+          </div>
+        </div>
+
+        <!-- Card 2: Questions Solved -->
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <i class="fas fa-circle-question"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ questions_solved }}</h3>
+            <p>Questions Solved</p>
+          </div>
+        </div>
+
+        <!-- Card 3: Accuracy -->
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <i class="fas fa-bullseye"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ accuracy }}</h3>
+            <p>Accuracy Rate</p>
+          </div>
+        </div>
+
+        <!-- Card 4: Study Streak -->
+        <div class="stat-card">
+          <div class="stat-icon orange">
+            <i class="fas fa-fire"></i>
+          </div>
+          <div class="stat-info">
+          <h3>
+            {{ study_streak }}
+            {% if study_streak == 1 %}
+            Day
+            {% else %}
+            Days
+            {% endif %}
+            🔥
+          </h3>
+            <p>Study Streak</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ANALYTICS & GOALS SPLIT GRID ===== -->
+      <div class="dashboard-split-grid">
+        
+        <!-- Left: Graph & Recommendation -->
+        <div class="split-left">
+          
+          <!-- Graph Card -->
+          <div class="dashboard-card chart-card">
+            <div class="card-header-bar">
+              <h2>Weekly Study Performance</h2>
+              <span class="legend">Hours studied</span>
+            </div>
+            
+            <div class="bar-chart-container">
+
+    {% for item in weekly_study_data %}
+
+    <div class="bar-column">
+
+        <div class="bar-track">
+
+            {% set height_pct = (item.hours / 4.0) * 100 %}
+
+            {% if height_pct > 100 %}
+                {% set height_pct = 100 %}
+            {% endif %}
+
+            {% if height_pct == 0 %}
+                {% set height_pct = 2 %}
+            {% endif %}
+
+            <div class="bar-fill" style="height: {{ height_pct }}%">
+                <span class="bar-tooltip">{{ item.hours }} hrs</span>
+            </div>
+
+        </div>
+
+        <span class="bar-date">{{ item.day }}</span>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+          </div>
+
+
+        </div>
+
+
+
+        <!-- Right: Daily Goals & Recent Activities -->
+        <div class="split-right">
+          
+          <!-- Daily Goal Progress Card -->
+          <div class="dashboard-card daily-goal-card">
+            <h2>Daily Goal Progress</h2>
+            <div class="goal-circle-wrapper">
+              <svg viewBox="0 0 100 100" class="progress-ring">
+                <!-- Outer Track -->
+                <circle cx="50" cy="50" r="42" stroke="#f1f5f9" stroke-width="8" fill="transparent" />
+                <!-- Active Circle -->
+                <circle cx="50" cy="50" r="42" stroke="#1d4ed8" stroke-width="8" fill="transparent"
+                  stroke-dasharray="263.89" stroke-dashoffset="{{ 263.89 - (goal_percentage * 263.89 / 100) }}" stroke-linecap="round" class="progress-ring-fill" />
+              </svg>
+              <div class="goal-percentage">
+                <span class="pct-num">{{ goal_percentage }}%</span>
+                <span class="pct-lbl">Complete</span>
+              </div>
+            </div>
+            <div class="goal-details">
+              <p>
+                 <strong>Goal target:</strong>
+                 {{ daily_goal // 60 }} hrs of practice
+              </p>
+              <p class="remaining-lbl">
+                <i class="fas fa-hourglass-half"></i>
+                {% if remaining_minutes > 0 %}
+                    {{ remaining_minutes }} minutes remaining today
+                {% else %}
+                    Daily Goal Completed 🎉
+                {% endif %}
+              </p>
+            </div>
+          </div>
+
+          <!-- Recent AI Doubts Card -->
+          <div class="dashboard-card recent-doubts-card">
+            <div class="card-header-bar" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+              <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main);">Recent AI Doubts</h2>
+              <a href="{{ url_for('doubt_solver.solver_page') }}" style="font-size: 0.85rem; color: var(--primary-blue); font-weight: 700; text-decoration: none;">Open Solver</a>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              {% if recent_doubts %}
+                {% for doubt in recent_doubts %}
+                  <div style="padding: 0.75rem; background-color: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--primary-blue);">
+                    <a href="{{ url_for('doubt_solver.solver_page', active_doubt_id=doubt.id) }}" style="text-decoration: none; color: var(--text-main); display: block;">
+                      <h4 style="margin: 0; font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ doubt.question }}</h4>
+                      <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem; display: block;">
+                        <i class="far fa-calendar"></i> {{ doubt.created_at }} &bull; Referenced: {{ doubt.pdf_name }}
+                      </span>
+                    </a>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div style="text-align: center; color: var(--text-muted); padding: 1rem 0;">
+                  <p style="font-size: 0.85rem; margin: 0;">No questions asked yet.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+      <!-- Footer -->
+      <footer class="dashboard-footer">
+        <p></p>
+      </footer>
+
+    </main>
+  </div>
+
+</body>
+</html>

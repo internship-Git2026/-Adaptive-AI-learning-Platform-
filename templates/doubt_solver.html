@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Doubt Solver · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <style>
+    /* White/Light Theme for the AI Doubt Solver */
+    .solver-container {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+      flex: 1;
+    }
+    @media (max-width: 900px) {
+      .solver-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* History Panel */
+    .history-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      height: 65vh;
+      box-shadow: var(--shadow-sm);
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-top: 0.25rem;
+    }
+    .history-header h3 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: var(--transition);
+      border-left: 3px solid transparent;
+    }
+    .history-item:hover {
+      background-color: #f1f5f9;
+      border-left-color: var(--primary-blue);
+    }
+    .history-item.active {
+      background-color: var(--primary-light);
+      border-left-color: var(--primary-blue);
+      border-color: rgba(37, 99, 235, 0.15);
+    }
+    .history-item-text {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 190px;
+      display: block;
+    }
+    .history-item-date {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 0.15rem;
+    }
+
+    .btn-clear {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .btn-clear:hover {
+      text-decoration: underline;
+    }
+    .btn-delete-item {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+      transition: var(--transition);
+    }
+    .btn-delete-item:hover {
+      color: #ef4444;
+    }
+
+    /* Workspace */
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .search-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-form {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .search-input {
+      flex: 1;
+      padding: 0.85rem 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text-main);
+      background-color: var(--bg-color);
+      transition: var(--transition);
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      background-color: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .btn-action-tutor {
+      background-color: var(--primary-blue);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .btn-action-tutor:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Response workspace cards */
+    .answer-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-md);
+    }
+    .answer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+    .answer-header h2 {
+      font-size: 1.35rem;
+      font-weight: 850;
+      color: var(--text-main);
+    }
+    
+    .answer-block {
+      padding: 1.25rem;
+      border-radius: 16px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary-blue);
+    }
+    .answer-block.definition { border-left-color: var(--primary-blue); }
+    .answer-block.explanation { border-left-color: #3b82f6; }
+    .answer-block.example { border-left-color: #10b981; }
+    .answer-block.analogy { border-left-color: #f59e0b; }
+    .answer-block.exam-tips { border-left-color: #1d4ed8; }
+    .answer-block.mistakes { border-left-color: #ef4444; }
+
+    .answer-block h3 {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+    .answer-block p, .answer-block li {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #334155;
+    }
+    .answer-block ul {
+      margin-left: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    /* Citation chips */
+    .reference-section {
+      border: 1px solid #bfdbfe;
+      background-color: var(--primary-light);
+      border-radius: 16px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .ref-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: #1e40af;
+      font-weight: 600;
+    }
+    .ref-item i {
+      color: var(--primary-blue);
+    }
+
+    /* Related Qs list */
+    .related-box {
+      border-top: 1px solid var(--border-color);
+      padding-top: 1rem;
+    }
+    .related-box h4 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+    .related-q-btn {
+      background: none;
+      border: none;
+      color: var(--primary-blue);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: left;
+      padding: 0.25rem 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .related-q-btn:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+
+    /* Suggested Revision badges */
+    .rev-box {
+      border-top: 1px solid var(--border-color);
+      padding-top: 1rem;
+    }
+    .rev-box h4 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+    .rev-badge {
+      background-color: var(--primary-light);
+      color: var(--primary-blue);
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Sidebar Menu Inclusion -->
+    {% include 'sidebar.html' %}
+    
+    <!-- Main Content Panel -->
+    <main class="app-main">
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert-flash {{ category }}">
+              <i class="fas fa-circle-info"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 style="font-size: 2.2rem; font-weight: 850; color: var(--text-main); letter-spacing: -1px; display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-question-circle" style="color: var(--primary-blue);"></i> AI Doubt Solver
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+            Ask doubts directly from your uploaded materials. Answers are derived strictly from your notes.
+          </p>
+        </div>
+        <div>
+          <a href="{{ url_for('doubt_solver.saved_doubts') }}" class="btn-action-tutor" style="background-color: #10b981;">
+            <i class="fas fa-bookmark"></i> Saved Doubts ({{ saved_count }})
+          </a>
+        </div>
+      </div>
+
+      <!-- SOLVER CONTAINER -->
+      <div class="solver-container">
+        
+        <!-- LEFT: QUESTION HISTORY -->
+        <div class="history-card">
+          <div class="history-header">
+            <h3>Doubt History</h3>
+            {% if history %}
+              <form action="{{ url_for('doubt_solver.clear_history') }}" method="POST" onsubmit="return confirm('Clear query history?');" style="margin:0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-clear">
+                  <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+              </form>
+            {% endif %}
+          </div>
+          <div class="history-list">
+            {% if history %}
+              {% for item in history %}
+                <div class="history-item {% if active_doubt and active_doubt.id == item.id %}active{% endif %}">
+                  <a href="{{ url_for('doubt_solver.solver_page', active_doubt_id=item.id) }}" style="text-decoration:none; flex:1;">
+                    <span class="history-item-text">{{ item.question }}</span>
+                    <span class="history-item-date">{{ item.created_at }}</span>
+                  </a>
+                  <form action="{{ url_for('doubt_solver.delete_doubt', doubt_id=item.id) }}" method="POST" style="margin:0;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-delete-item" title="Delete entry">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </form>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 2rem;">
+                No questions asked yet.
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- RIGHT: SEARCH & WORKSPACE -->
+        <div class="workspace">
+          
+          <!-- Search box -->
+          <div class="search-card">
+            <form action="{{ url_for('doubt_solver.solver_page') }}" method="POST" class="search-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="text" name="question" class="search-input" placeholder="Ask a question (e.g. 'What is Mutual Exclusion?', 'Explain Deadlocks')" required />
+              <button type="submit" class="btn-action-tutor">
+                <i class="fas fa-paper-plane"></i> Solve Doubt
+              </button>
+            </form>
+          </div>
+
+          <!-- Active Answer -->
+          {% if active_doubt %}
+            <div class="answer-card">
+              
+              <div class="answer-header">
+                <div>
+                  <span style="font-size:0.7rem; font-weight:800; text-transform:uppercase; color:var(--primary-blue); display:block; margin-bottom:0.25rem;">Question Asked</span>
+                  <h2>"{{ active_doubt.question }}"</h2>
+                  <span style="font-size:0.75rem; color:var(--text-muted);"><i class="far fa-clock"></i> Asked on {{ active_doubt.created_at }}</span>
+                </div>
+                
+                <form action="{{ url_for('doubt_solver.bookmark_doubt', doubt_id=active_doubt.id) }}" method="POST" style="margin: 0;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-action-tutor" style="background-color: #10b981; padding: 0.5rem 1rem; font-size: 0.8rem;">
+                    <i class="far fa-bookmark"></i> Bookmark Answer
+                  </button>
+                </form>
+              </div>
+
+              {% if active_doubt.parsed_answer %}
+                {% set ans = active_doubt.parsed_answer %}
+                
+                <!-- Definition -->
+                <div class="answer-block definition">
+                  <h3>Short Definition</h3>
+                  <p>{{ ans.short_definition }}</p>
+                </div>
+
+                <!-- Detailed Explanation -->
+                <div class="answer-block explanation">
+                  <h3>Detailed Explanation</h3>
+                  <p>{{ ans.detailed_explanation }}</p>
+                </div>
+
+                <!-- Simple Example -->
+                <div class="answer-block example">
+                  <h3>Simple Example</h3>
+                  <p>{{ ans.simple_example }}</p>
+                </div>
+
+                <!-- Real-world Analogy -->
+                <div class="answer-block analogy">
+                  <h3>Real-world Analogy</h3>
+                  <p>{{ ans.real_world_analogy }}</p>
+                </div>
+
+                <!-- Important Exam Points -->
+                {% if ans.exam_points %}
+                  <div class="answer-block exam-tips">
+                    <h3>Important Exam Points</h3>
+                    <ul>
+                      {% for pt in ans.exam_points %}
+                        <li>{{ pt }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+
+                <!-- Common Mistakes -->
+                {% if ans.common_mistakes %}
+                  <div class="answer-block mistakes">
+                    <h3>Common Mistakes</h3>
+                    <ul>
+                      {% for mk in ans.common_mistakes %}
+                        <li>{{ mk }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+
+                <!-- Revision Summary -->
+                <div class="answer-block explanation" style="border-left-color: #10b981;">
+                  <h3>Quick Revision Summary</h3>
+                  <p>{{ ans.revision_summary }}</p>
+                </div>
+
+                <!-- Citation Reference -->
+                <div class="reference-section">
+                  <span style="font-size:0.8rem; font-weight:800; color:#1e40af; display:block; width:100%; margin-bottom:-0.5rem;"><i class="fas fa-quote-left"></i> Note References</span>
+                  <div class="ref-item">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>PDF Name: {{ active_doubt.pdf_name }}</span>
+                  </div>
+                  <div class="ref-item">
+                    <i class="fas fa-book-open"></i>
+                    <span>Page: {{ active_doubt.page_number }}</span>
+                  </div>
+                  <div class="ref-item">
+                    <i class="fas fa-bookmark"></i>
+                    <span>Chapter: {{ active_doubt.chapter }}</span>
+                  </div>
+                  <div class="ref-item">
+                    <i class="fas fa-tag"></i>
+                    <span>Topic: {{ active_doubt.topic }}</span>
+                  </div>
+                  <div class="ref-item">
+                    <i class="fas fa-signal"></i>
+                    <span>Difficulty: <span style="font-weight:800; color:{% if ans.difficulty|lower == 'easy' %}#10b981{% elif ans.difficulty|lower == 'medium' %}#f59e0b{% else %}#ef4444{% endif %};">{{ ans.difficulty }}</span></span>
+                  </div>
+                </div>
+
+                <!-- Related Questions -->
+                {% if ans.related_questions %}
+                  <div class="related-box">
+                    <h4>Related Questions</h4>
+                    <div class="related-list">
+                      {% for rq in ans.related_questions %}
+                        <form action="{{ url_for('doubt_solver.solver_page') }}" method="POST" style="margin:0;">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <input type="hidden" name="question" value="{{ rq }}" />
+                          <button type="submit" class="related-q-btn">
+                            <i class="fas fa-arrow-right"></i> {{ rq }}
+                          </button>
+                        </form>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+
+                <!-- Suggested Revision -->
+                {% if ans.suggested_revision_topics %}
+                  <div class="rev-box">
+                    <h4>Suggested Revision</h4>
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                      {% for srt in ans.suggested_revision_topics %}
+                        <span class="rev-badge">
+                          <i class="fas fa-rotate"></i> {{ srt }}
+                        </span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+
+              {% else %}
+                <div class="answer-block mistakes" style="background-color: #fef2f2; border-left-color: #ef4444; border-color: #fee2e2;">
+                  <h3>AI Output</h3>
+                  <p>{{ active_doubt.answer }}</p>
+                </div>
+              {% endif %}
+
+            </div>
+          {% else %}
+            <!-- Greeting empty state -->
+            <div class="answer-card" style="text-align: center; padding: 4rem 0;">
+              <div>
+                <i class="fas fa-robot" style="font-size: 3.5rem; color: var(--primary-blue); margin-bottom: 1.5rem; display:block;"></i>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">Intelligent Doubt Workspace</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
+                  Enter your question above to query your uploaded study materials. The AI Doubt Solver will explain the concepts directly from your notes.
+                </p>
+              </div>
+            </div>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <footer class="dashboard-footer" style="text-align: center; padding: 2rem 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: auto;">
+        <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    // Handle mobile sidebar toggles if needed
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+      document.getElementById('appSidebar').classList.add('open');
+      document.getElementById('sidebarBackdrop').classList.add('active');
+    });
+    document.getElementById('sidebarBackdrop')?.addEventListener('click', () => {
+      document.getElementById('appSidebar').classList.remove('open');
+      document.getElementById('sidebarBackdrop').classList.remove('active');
+    });
+  </script>
+</body>
+</html>

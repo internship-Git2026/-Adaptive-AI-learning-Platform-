@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saved Doubts · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <style>
+    /* White/Light Theme for Saved Doubts layout */
+    .saved-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .saved-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      transition: var(--transition);
+    }
+    .saved-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+    .saved-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+    .saved-header h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .saved-header p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    
+    .btn-action-tutor {
+      background-color: var(--primary-blue);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .btn-action-tutor:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-delete {
+      background-color: #fef2f2;
+      color: #ef4444;
+      border: 1px solid #fee2e2;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: var(--transition);
+    }
+    .btn-delete:hover {
+      background-color: #ef4444;
+      color: white;
+      border-color: #ef4444;
+    }
+
+    .answer-block {
+      padding: 1rem;
+      border-radius: 12px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary-blue);
+    }
+    .answer-block h3 {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+    }
+    .answer-block p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #334155;
+    }
+
+    .reference-section {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-color);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .ref-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .ref-item i {
+      color: var(--primary-blue);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Sidebar Menu Inclusion -->
+    {% include 'sidebar.html' %}
+    
+    <!-- Main Content Panel -->
+    <main class="app-main">
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert-flash {{ category }}">
+              <i class="fas fa-circle-info"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 style="font-size: 2.2rem; font-weight: 850; color: var(--text-main); letter-spacing: -1px; display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-bookmark" style="color: #10b981;"></i> Bookmarked Doubts
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+            Your saved AI doubts and tutor explanations.
+          </p>
+        </div>
+        <div>
+          <a href="{{ url_for('doubt_solver.solver_page') }}" class="btn-action-tutor">
+            <i class="fas fa-arrow-left"></i> Back to Solver
+          </a>
+        </div>
+      </div>
+
+      <!-- SAVED LIST -->
+      <div class="saved-list-container">
+        {% if saved_list %}
+          {% for item in saved_list %}
+            <div class="saved-card">
+              
+              <div class="saved-header">
+                <div>
+                  <h2>"{{ item.question }}"</h2>
+                  <p><i class="far fa-calendar"></i> Saved on {{ item.created_at }}</p>
+                </div>
+                <form action="{{ url_for('doubt_solver.delete_saved', saved_id=item.id) }}" method="POST" onsubmit="return confirm('Remove bookmark?');" style="margin: 0;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  <button type="submit" class="btn-delete">
+                    <i class="fas fa-trash-alt"></i> Remove Bookmark
+                  </button>
+                </form>
+              </div>
+
+              {% if item.parsed_answer %}
+                {% set ans = item.parsed_answer %}
+                
+                <!-- Definition -->
+                <div class="answer-block" style="border-left-color: var(--primary-blue);">
+                  <h3>Short Definition</h3>
+                  <p>{{ ans.short_definition }}</p>
+                </div>
+
+                <!-- Explanation -->
+                <div class="answer-block" style="border-left-color: #3b82f6;">
+                  <h3>Detailed Explanation</h3>
+                  <p>{{ ans.detailed_explanation }}</p>
+                </div>
+
+                <!-- Example -->
+                <div class="answer-block" style="border-left-color: #10b981;">
+                  <h3>Example</h3>
+                  <p>{{ ans.simple_example }}</p>
+                </div>
+
+                <!-- Analogy -->
+                <div class="answer-block" style="border-left-color: #f59e0b;">
+                  <h3>Analogy</h3>
+                  <p>{{ ans.real_world_analogy }}</p>
+                </div>
+
+                <!-- Reference Citation -->
+                <div class="reference-section">
+                  <div class="ref-item">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>PDF: {{ item.pdf_name }}</span>
+                  </div>
+                  <div class="ref-item">
+                    <i class="fas fa-book-open"></i>
+                    <span>Page: {{ item.page_number }}</span>
+                  </div>
+                  <div class="ref-item">
+                    <i class="fas fa-bookmark"></i>
+                    <span>Chapter: {{ item.chapter }}</span>
+                  </div>
+                  <div class="ref-item">
+                    <i class="fas fa-tag"></i>
+                    <span>Topic: {{ item.topic }}</span>
+                  </div>
+                </div>
+
+              {% else %}
+                <div class="answer-block" style="border-left-color: #ef4444;">
+                  <h3>AI Output</h3>
+                  <p>{{ item.answer }}</p>
+                </div>
+              {% endif %}
+
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="saved-card" style="text-align: center; padding: 4rem 0;">
+            <i class="fas fa-bookmark" style="font-size: 3rem; color: var(--text-muted); opacity: 0.3; margin-bottom: 1rem; display:block;"></i>
+            <h3 style="font-size:1.1rem; color:var(--text-main); font-weight:700;">No bookmarked doubts</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem; max-width: 400px; margin: 0.5rem auto 0 auto;">
+              Bookmark explanations in the AI Doubt Solver to save them here for quick study references.
+            </p>
+          </div>
+        {% endif %}
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Handle mobile sidebar toggles if needed
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+      document.getElementById('appSidebar').classList.add('open');
+      document.getElementById('sidebarBackdrop').classList.add('active');
+    });
+    document.getElementById('sidebarBackdrop')?.addEventListener('click', () => {
+      document.getElementById('appSidebar').classList.remove('open');
+      document.getElementById('sidebarBackdrop').classList.remove('active');
+    });
+  </script>
+</body>
+</html>

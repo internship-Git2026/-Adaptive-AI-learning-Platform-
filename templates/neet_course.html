@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEET syllabus · AdaptiveGATE AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base_layout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='my_courses.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='course_page.css') }}" />
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Sidebar Menu Inclusion -->
+    {% include 'sidebar.html' %}
+    
+    <!-- Main Syllabus Body -->
+    <main class="app-main">
+
+      <!-- Back Link & Action Bar -->
+      <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <a href="{{ url_for('my_courses.my_courses_page') }}" style="color: #10b981; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">
+          <i class="fas fa-arrow-left"></i> Back to Courses
+        </a>
+        <div style="display: flex; gap: 0.75rem;">
+          <a href="{{ url_for('pdf_upload.upload_page', course='NEET') }}" class="btn-module-action neet-btn" style="background-color: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fas fa-cloud-upload-alt"></i> Upload PDF
+          </a>
+          <a href="{{ url_for('practice.adaptive_quiz', course='NEET') }}" class="btn-module-action neet-btn" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fas fa-bolt"></i> Start Adaptive Quiz
+          </a>
+        </div>
+      </div>
+
+      <!-- Syllabus Header Banner -->
+      <div class="welcome-banner" style="background: linear-gradient(135deg, #064e3b, #022c22); border-radius: 1.25rem; padding: 2rem;">
+        <div class="welcome-text">
+          <h1 style="display: flex; align-items: center; gap: 0.75rem; color: #ffffff;">
+            <i class="fas fa-stethoscope" style="color: #34d399;"></i> NEET Syllabus Tracker
+          </h1>
+          <p style="color: #a7f3d0;">Review medical subject module syllabus items, trace status limits, and launch adaptive test configurations.</p>
+        </div>
+      </div>
+
+      <!-- Modules Listing -->
+      <div class="history-section" style="border-radius: 1.25rem;">
+        <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">NEET Syllabus Subjects</h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Verify completion rate indexes for core topics.</p>
+
+        <div class="module-list">
+          
+          {% for subject in subjects %}
+          <!-- Module -->
+          <div class="module-card">
+            <div class="module-info">
+              <div class="module-icon neet-icon"><i class="{{ subject.icon }}"></i></div>
+              <div class="module-details">
+                <h4>{{ subject.name }}</h4>
+                <p>{{ subject.description }}</p>
+              </div>
+            </div>
+            <div class="module-progress">
+              <div class="module-progress-track">
+                <div class="module-progress-fill {{ subject.status_class }}"
+                  style="width: {{ subject.pct if subject.pct > 0 else 2 }}%;"></div>
+              </div>
+              <span class="module-status {{ subject.status_class }}">{{ subject.status_label }}</span>
+            </div>
+            <a href="{{ url_for('practice.subject_practice', course='NEET', subject_key=subject.key) }}" class="btn-module-action neet-btn">Practice Subject</a>
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="dashboard-footer">
+        <p>© 2026 AdaptiveGATE AI. All rights reserved.</p>
+      </footer>
+
+    </main>
+  </div>
+
+</body>
+</html>
