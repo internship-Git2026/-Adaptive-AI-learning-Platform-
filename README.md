@@ -192,11 +192,7 @@ The app will start on `http://localhost:5000`.
 
 ## 🎯 Pricing Plans
 
-| Plan | Price | Access |
-|------|-------|--------|
-| GATE Only | ₹1,000 | All GATE subjects |
-| NEET Only | ₹1,000 | All NEET subjects |
-| GATE + NEET | ₹1,500 | All subjects (best value) |
+Pricing will be decided based on outcome — no fixed plans upfront.
 
 Free trial available with device fingerprint + per-IP caps to prevent abuse.
 
