@@ -131,7 +131,7 @@ AI_Adaptive_Learning_Platform/
 
 ```bash
 # Clone the repository
-git clone https://github.com/shreeharichandrakumar24-maker/AI_Adaptive_Learning_Platform.git
+git clone https://github.com/internship-Git2026/Adaptive-AI-learning-Platform.git
 cd AI_Adaptive_Learning_Platform
 
 # Create virtual environment
