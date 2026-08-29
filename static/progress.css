@@ -17,6 +17,51 @@
   margin-top: 0.35rem;
 }
 
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.course-toggle {
+  display: flex;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-btn {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  border: none;
+  background: transparent;
+}
+
+.toggle-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-blue);
+}
+
+.toggle-btn.active {
+  background-color: var(--primary-blue);
+  color: #ffffff;
+}
+
+.toggle-btn i {
+  font-size: 0.85rem;
+}
+
 /* --- Metrics Grid --- */
 .metrics-grid {
   display: grid;

@@ -68,25 +68,46 @@ GATE_SUBJECTS = [
 # NEET subjects with their PDF keyword patterns and metadata
 NEET_SUBJECTS = [
     {
-        "key": "biology",
-        "name": "Biology — Zoology & Botany",
-        "description": "Genetics, Human Physiology, Plant Reproduction, Cell Biology, Ecology",
+        "key": "zoology",
+        "name": "Zoology",
+        "description": "Animal Kingdom, Structural Organisation, Human Physiology, Reproduction, Genetics & Evolution",
+        "icon": "fas fa-paw",
+        "keywords": ["zoology", "animal kingdom", "structural organisation", "human physiology", "reproduction", "genetics", "evolution", "digestion", "circulation", "respiration", "excretion", "nervous system", "hormones", "locomotion"]
+    },
+    {
+        "key": "botany",
+        "name": "Botany",
+        "description": "Plant Kingdom, Morphology, Anatomy, Photosynthesis, Plant Physiology, Ecology",
         "icon": "fas fa-leaf",
-        "keywords": ["biology", "zoology", "botany", "genetics", "physiology", "plant reproduction", "cell biology", "ecology", "human physiology"]
+        "keywords": ["botany", "plant kingdom", "morphology", "anatomy", "photosynthesis", "plant physiology", "ecology", "plant reproduction", "transpiration", "respiration", "nitrogen fixation", "plant growth"]
     },
     {
-        "key": "chemistry",
-        "name": "Chemistry",
-        "description": "Organic Chemistry, Periodic Table, Chemical Bonding, Equilibrium",
-        "icon": "fas fa-flask",
-        "keywords": ["chemistry", "organic", "periodic table", "chemical bonding", "equilibrium"]
-    },
-    {
-        "key": "physics",
+        "key": "physics_neet",
         "name": "Physics",
-        "description": "Thermodynamics, Optics, Kinematics, Modern Physics, Mechanics",
+        "description": "Mechanics, Thermodynamics, Optics, Electromagnetism, Modern Physics, Waves",
         "icon": "fas fa-atom",
-        "keywords": ["physics", "thermodynamics", "optics", "kinematics", "modern physics", "mechanics"]
+        "keywords": ["physics", "mechanics", "thermodynamics", "optics", "electromagnetism", "modern physics", "waves", "kinematics", "electrostatics", "current electricity", "magnetic effects", "electromagnetic induction", "dual nature", "atoms", "nuclei", "semiconductors"]
+    },
+    {
+        "key": "physical_chemistry",
+        "name": "Physical Chemistry",
+        "description": "Mole Concept, Atomic Structure, Thermodynamics, Equilibrium, Electrochemistry, Kinetics",
+        "icon": "fas fa-fire",
+        "keywords": ["physical chemistry", "mole concept", "atomic structure", "thermodynamics", "equilibrium", "electrochemistry", "kinetics", "solutions", "solid state", "surface chemistry", "states of matter"]
+    },
+    {
+        "key": "organic_chemistry",
+        "name": "Organic Chemistry",
+        "description": "Hydrocarbons, Haloalkanes, Alcohols, Aldehydes, Ketones, Carboxylic Acids, Polymers",
+        "icon": "fas fa-vial",
+        "keywords": ["organic chemistry", "hydrocarbons", "haloalkanes", "alcohols", "aldehydes", "ketones", "carboxylic acids", "polymers", "biomolecules", "chemistry in everyday life", "organometallics", "s-block", "p-block", "d-block", "f-block"]
+    },
+    {
+        "key": "inorganic_chemistry",
+        "name": "Inorganic Chemistry",
+        "description": "Periodic Table, Chemical Bonding, Coordination Compounds, Metallurgy, p-Block Elements",
+        "icon": "fas fa-flask",
+        "keywords": ["inorganic chemistry", "periodic table", "chemical bonding", "coordination compounds", "metallurgy", "p-block", "s-block", "d-block", "f-block", "hydrogen", "solutions", "qualitative analysis"]
     },
 ]
 

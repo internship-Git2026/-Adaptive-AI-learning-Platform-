@@ -44,6 +44,32 @@
                     Edit Profile
                 </h1>
 
+                <!-- Profile Photo Section -->
+                <div class="edit-photo-section">
+                    <div class="edit-photo-preview">
+                        <img src="{{ url_for('profile.serve_photo', user_id=user.id) }}" alt="Profile"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="profile-avatar-fallback" style="display:none;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div class="edit-photo-actions">
+                        <form method="POST" action="{{ url_for('profile.upload_photo') }}" enctype="multipart/form-data" class="edit-photo-upload-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <label for="edit-photo-input" class="edit-photo-btn edit-photo-change">
+                                <i class="fas fa-camera"></i> Change Photo
+                            </label>
+                            <input type="file" id="edit-photo-input" name="photo" accept="image/*" style="display:none;" onchange="this.form.submit();">
+                        </form>
+                        <form method="POST" action="{{ url_for('profile.delete_photo') }}" class="edit-photo-remove-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="edit-photo-btn edit-photo-remove" onclick="return confirm('Remove your profile photo?');">
+                                <i class="fas fa-trash-alt"></i> Remove Photo
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
                 <form method="POST">
 
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -56,16 +82,6 @@
                     <div class="input-group">
                         <label>Email</label>
                         <input type="email" name="email" value="{{ user.email }}" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Phone Number</label>
-                        <input type="text" name="phone" value="{{ user.phone }}">
-                    </div>
-
-                    <div class="input-group">
-                        <label>College</label>
-                        <input type="text" name="college" value="{{ user.college }}">
                     </div>
 
                     <div class="input-group">

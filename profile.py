@@ -265,9 +265,7 @@ def profile_page():
 
         email=user["email"],
 
-        phone=user["phone"],
 
-        college=user["college"], 
 
         department=user["department"],
 

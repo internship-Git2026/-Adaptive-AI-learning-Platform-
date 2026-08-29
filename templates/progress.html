@@ -24,6 +24,14 @@
           <h1>Progress Analytics</h1>
           <p class="subtitle">Detailed breakdown of your learning track metrics, study times, and quiz history.</p>
         </div>
+        <div class="course-toggle">
+          <a href="{{ url_for('progress.progress_page', course='GATE') }}" class="toggle-btn {% if user_course == 'GATE' %}active{% endif %}">
+            <i class="fas fa-microchip"></i> GATE
+          </a>
+          <a href="{{ url_for('progress.progress_page', course='NEET') }}" class="toggle-btn {% if user_course == 'NEET' %}active{% endif %}">
+            <i class="fas fa-leaf"></i> NEET
+          </a>
+        </div>
       </div>
 
       <!-- Stats Grid -->
@@ -385,8 +393,8 @@
       <!-- Weak Subjects & Recommended Study Playlists (loaded async) -->
       <div class="history-section" id="weak-areas-section">
         <div class="history-title">
-          <h2><i class="fas fa-lightbulb" style="color: #f59e0b; margin-right: 0.50rem;"></i> Weak Areas — Recommended Study Playlists</h2>
-          <p>Your weakest {{ user_course }} topics with curated open-access study resources.</p>
+          <h2><i class="fas fa-lightbulb" style="color: #f59e0b; margin-right: 0.50rem;"></i> Recommended Study Playlists</h2>
+          <p>{{ user_course }} topics with curated open-access study resources.</p>
         </div>
 
         <!-- Static weak subject cards (instant, no YouTube links yet) -->
@@ -433,7 +441,7 @@
   <script>
     // Load weak areas + YouTube resources asynchronously after page load
     document.addEventListener('DOMContentLoaded', function() {
-      fetch('{{ url_for("progress.weak_subjects_api") }}')
+      fetch('{{ url_for("progress.weak_subjects_api", course=user_course) }}')
         .then(function(r) { return r.json(); })
         .then(function(data) {
           if (!data.weak_subjects || data.weak_subjects.length === 0) {

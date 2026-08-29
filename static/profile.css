@@ -153,6 +153,33 @@ background:#1d4ed8;
 transform:scale(1.1);
 }
 
+.photo-remove-form{
+position:absolute;
+bottom:8px;
+right:56px;
+}
+
+.photo-remove-btn{
+width:40px;
+height:40px;
+border-radius:50%;
+background:#ef4444;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+box-shadow:0 4px 12px rgba(239,68,68,.4);
+transition:all .2s ease;
+font-size:0.85rem;
+border:3px solid #fff;
+}
+
+.photo-remove-btn:hover{
+background:#dc2626;
+transform:scale(1.1);
+}
+
 .profile-details{
 
 flex:1;
@@ -1525,6 +1552,152 @@ color:white;
 .edit-profile-card h1 i{
 
     margin-right:10px;
+
+}
+
+/* ================= EDIT PROFILE PHOTO SECTION ================= */
+
+.edit-photo-section{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:24px;
+
+    padding:20px 24px;
+
+    background:#f8fafc;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:16px;
+
+    margin-bottom:28px;
+
+}
+
+.edit-photo-preview{
+
+    width:100px;
+
+    height:100px;
+
+    flex-shrink:0;
+
+}
+
+.edit-photo-preview img{
+
+    width:100px;
+
+    height:100px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:4px solid white;
+
+    box-shadow:0 8px 20px rgba(37,99,235,.15);
+
+}
+
+.edit-photo-preview .profile-avatar-fallback{
+
+    width:100px;
+
+    height:100px;
+
+    border-radius:50%;
+
+    border:4px solid white;
+
+    box-shadow:0 8px 20px rgba(37,99,235,.15);
+
+    background:linear-gradient(135deg,#dbeafe,#eff6ff);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:2.2rem;
+
+    color:#2563eb;
+
+}
+
+.edit-photo-actions{
+
+    display:flex;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+}
+
+.edit-photo-btn{
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    transition:all .2s ease;
+
+    border:none;
+
+    font-family:inherit;
+
+}
+
+.edit-photo-change{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.edit-photo-change:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-1px);
+
+}
+
+.edit-photo-remove{
+
+    background:white;
+
+    color:#ef4444;
+
+    border:1px solid #fecaca;
+
+}
+
+.edit-photo-remove:hover{
+
+    background:#fef2f2;
+
+    border-color:#ef4444;
+
+    transform:translateY(-1px);
 
 }
 

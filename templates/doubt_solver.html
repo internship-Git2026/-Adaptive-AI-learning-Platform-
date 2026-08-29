@@ -304,6 +304,71 @@
       align-items: center;
       gap: 0.35rem;
     }
+
+    /* YouTube Videos Tab */
+    .yt-section {
+      border-top: 1px solid var(--border-color);
+      padding-top: 1rem;
+    }
+    .yt-section h4 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .yt-section h4 i {
+      color: #ef4444;
+    }
+    .yt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .yt-card {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: var(--transition);
+      text-decoration: none;
+      display: block;
+    }
+    .yt-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-color: #ef4444;
+    }
+    .yt-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+      background: #f1f5f9;
+    }
+    .yt-info {
+      padding: 0.75rem;
+    }
+    .yt-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 0.35rem;
+    }
+    .yt-channel {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
   </style>
 </head>
 <body>
@@ -333,12 +398,29 @@
         <div>
           <h1 style="font-size: 2.2rem; font-weight: 850; color: var(--text-main); letter-spacing: -1px; display:flex; align-items:center; gap:0.5rem;">
             <i class="fas fa-question-circle" style="color: var(--primary-blue);"></i> AI Doubt Solver
+            {% if both_courses %}
+              <span style="font-size:0.75rem; padding:0.35rem 0.75rem; border-radius:20px; font-weight:700; margin-left:0.5rem; background:{{ 'linear-gradient(135deg, #2563eb, #3b82f6)' if active_course == 'GATE' else 'linear-gradient(135deg, #16a34a, #22c55e)' }}; color:#fff; letter-spacing:0.5px;">{{ active_course }}</span>
+            {% elif has_neet %}
+              <span style="font-size:0.75rem; padding:0.35rem 0.75rem; border-radius:20px; font-weight:700; margin-left:0.5rem; background:linear-gradient(135deg, #16a34a, #22c55e); color:#fff; letter-spacing:0.5px;">NEET</span>
+            {% elif has_gate %}
+              <span style="font-size:0.75rem; padding:0.35rem 0.75rem; border-radius:20px; font-weight:700; margin-left:0.5rem; background:linear-gradient(135deg, #2563eb, #3b82f6); color:#fff; letter-spacing:0.5px;">GATE</span>
+            {% endif %}
           </h1>
           <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
-            Ask doubts directly from your uploaded materials. Answers are derived strictly from your notes.
+            Ask doubts directly from your uploaded {{ active_course }} materials. Answers are derived strictly from your notes.
           </p>
         </div>
-        <div>
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+          {% if both_courses %}
+            <div style="display:flex; background:var(--card-bg); border:1px solid var(--border-color); border-radius:12px; overflow:hidden; box-shadow:var(--shadow-sm);">
+              <a href="{{ url_for('doubt_solver.solver_page', course='GATE') }}" style="padding:0.55rem 1.1rem; font-size:0.85rem; font-weight:700; text-decoration:none; color:{{ '#fff' if active_course == 'GATE' else 'var(--text-muted)' }}; background:{{ 'var(--primary-blue)' if active_course == 'GATE' else 'transparent' }}; display:flex; align-items:center; gap:0.4rem; transition:all 0.2s;">
+                <i class="fas fa-microchip"></i> GATE
+              </a>
+              <a href="{{ url_for('doubt_solver.solver_page', course='NEET') }}" style="padding:0.55rem 1.1rem; font-size:0.85rem; font-weight:700; text-decoration:none; color:{{ '#fff' if active_course == 'NEET' else 'var(--text-muted)' }}; background:{{ '#16a34a' if active_course == 'NEET' else 'transparent' }}; display:flex; align-items:center; gap:0.4rem; transition:all 0.2s;">
+                <i class="fas fa-leaf"></i> NEET
+              </a>
+            </div>
+          {% endif %}
           <a href="{{ url_for('doubt_solver.saved_doubts') }}" class="btn-action-tutor" style="background-color: #10b981;">
             <i class="fas fa-bookmark"></i> Saved Doubts ({{ saved_count }})
           </a>
@@ -354,6 +436,7 @@
             <h3>Doubt History</h3>
             {% if history %}
               <form action="{{ url_for('doubt_solver.clear_history') }}" method="POST" onsubmit="return confirm('Clear query history?');" style="margin:0;">
+                <input type="hidden" name="active_course" value="{{ active_course }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn-clear">
                   <i class="fas fa-trash-alt"></i> Clear All
@@ -365,12 +448,13 @@
             {% if history %}
               {% for item in history %}
                 <div class="history-item {% if active_doubt and active_doubt.id == item.id %}active{% endif %}">
-                  <a href="{{ url_for('doubt_solver.solver_page', active_doubt_id=item.id) }}" style="text-decoration:none; flex:1;">
+                  <a href="{{ url_for('doubt_solver.solver_page', active_doubt_id=item.id, course=active_course) }}" style="text-decoration:none; flex:1;">
                     <span class="history-item-text">{{ item.question }}</span>
                     <span class="history-item-date">{{ item.created_at }}</span>
                   </a>
                   <form action="{{ url_for('doubt_solver.delete_doubt', doubt_id=item.id) }}" method="POST" style="margin:0;">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="active_course" value="{{ active_course }}">
                     <button type="submit" class="btn-delete-item" title="Delete entry">
                       <i class="fas fa-times"></i>
                     </button>
@@ -390,9 +474,10 @@
           
           <!-- Search box -->
           <div class="search-card">
-            <form action="{{ url_for('doubt_solver.solver_page') }}" method="POST" class="search-form">
+            <form action="{{ url_for('doubt_solver.solver_page', course=active_course) }}" method="POST" class="search-form">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <input type="text" name="question" class="search-input" placeholder="Ask a question (e.g. 'What is Mutual Exclusion?', 'Explain Deadlocks')" required />
+              <input type="hidden" name="active_course" value="{{ active_course }}">
+              <input type="text" name="question" class="search-input" placeholder="Ask a {{ active_course }} question (e.g. 'What is Mutual Exclusion?', 'Explain Deadlocks')" required />
               <button type="submit" class="btn-action-tutor">
                 <i class="fas fa-paper-plane"></i> Solve Doubt
               </button>
@@ -412,6 +497,7 @@
                 
                 <form action="{{ url_for('doubt_solver.bookmark_doubt', doubt_id=active_doubt.id) }}" method="POST" style="margin: 0;">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="active_course" value="{{ active_course }}">
                   <button type="submit" class="btn-action-tutor" style="background-color: #10b981; padding: 0.5rem 1rem; font-size: 0.8rem;">
                     <i class="far fa-bookmark"></i> Bookmark Answer
                   </button>
@@ -506,8 +592,9 @@
                     <h4>Related Questions</h4>
                     <div class="related-list">
                       {% for rq in ans.related_questions %}
-                        <form action="{{ url_for('doubt_solver.solver_page') }}" method="POST" style="margin:0;">
+                        <form action="{{ url_for('doubt_solver.solver_page', course=active_course) }}" method="POST" style="margin:0;">
                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <input type="hidden" name="active_course" value="{{ active_course }}">
                           <input type="hidden" name="question" value="{{ rq }}" />
                           <button type="submit" class="related-q-btn">
                             <i class="fas fa-arrow-right"></i> {{ rq }}
@@ -527,6 +614,28 @@
                         <span class="rev-badge">
                           <i class="fas fa-rotate"></i> {{ srt }}
                         </span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+
+                <!-- Related YouTube Videos -->
+                {% if youtube_videos %}
+                  <div class="yt-section">
+                    <h4><i class="fab fa-youtube"></i> Related Videos</h4>
+                    <div class="yt-grid">
+                      {% for vid in youtube_videos %}
+                        <a href="{{ vid.url }}" target="_blank" rel="noopener noreferrer" class="yt-card">
+                          {% if vid.thumbnail %}
+                            <img src="{{ vid.thumbnail }}" alt="{{ vid.title }}" class="yt-thumb" loading="lazy">
+                          {% else %}
+                            <div class="yt-thumb" style="display:flex;align-items:center;justify-content:center;font-size:2rem;color:#ef4444;"><i class="fab fa-youtube"></i></div>
+                          {% endif %}
+                          <div class="yt-info">
+                            <div class="yt-title">{{ vid.title }}</div>
+                            <div class="yt-channel"><i class="fas fa-user-circle"></i> {{ vid.channel }}</div>
+                          </div>
+                        </a>
                       {% endfor %}
                     </div>
                   </div>

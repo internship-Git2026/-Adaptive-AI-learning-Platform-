@@ -1,6 +1,8 @@
 import json
 import sqlite3
 import logging
+import os
+import requests
 from datetime import datetime, date
 from flask import Blueprint, render_template, redirect, url_for, session, flash, request, jsonify
 from database import get_db, DB_PATH
@@ -9,10 +11,29 @@ from activity import add_activity
 from llm import generate
 from pdf_storage import get_pdf_path
 from pdf_text_extraction import extract_pdf_pages
+from course_access import has_course_access, get_purchased_courses
 
 logger = logging.getLogger(__name__)
 
 doubt_solver_bp = Blueprint('doubt_solver', __name__, url_prefix='/dashboard/doubt-solver')
+
+def _matches_course(pdf_name, subject, course):
+    """Check if a doubt history item belongs to the given course.
+    
+    The `subject` field in ai_doubt_history stores the course name
+    (e.g. 'GATE' or 'NEET') derived from the PDF's course column.
+    We use that directly for reliable filtering.
+    """
+    # If subject field contains the course name, use it directly
+    if subject:
+        subject_upper = subject.strip().upper()
+        if subject_upper == course:
+            return True
+        if subject_upper in ('GATE', 'NEET'):
+            # subject is a known course but different from requested
+            return False
+    # Fallback for legacy entries without course info — show in both
+    return True
 
 # Helper to clean text
 def clean_extracted_text(text):
@@ -122,6 +143,62 @@ def index_pdf_pages(pdf_id, user_id=None):
     conn.close()
     return True
 
+# YouTube search for related educational videos
+def search_youtube_videos(query, course='GATE', max_results=3):
+    """Search YouTube Data API for educational videos related to the doubt.
+    
+    Always prepends course name and educational keywords to ensure
+    results are tutorial/lecture content relevant to GATE or NEET.
+    """
+    api_key = os.getenv("YOUTUBE_API_KEY", "")
+    if not api_key:
+        logger.warning("DOUBT_SOLVER: YOUTUBE_API_KEY not set")
+        return []
+
+    # Build an education-focused search query
+    course_label = 'GATE exam' if course == 'GATE' else 'NEET exam'
+    educational_query = f"{query} {course_label} tutorial lecture study"
+
+    params = {
+        "key": api_key,
+        "q": educational_query,
+        "part": "snippet",
+        "type": "video",
+        "maxResults": max_results,
+        "relevanceLanguage": "en",
+        "videoDuration": "medium",
+        "safeSearch": "strict",
+        "order": "relevance",
+    }
+
+    try:
+        resp = requests.get("https://www.googleapis.com/youtube/v3/search", params=params, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as exc:
+        logger.warning("DOUBT_SOLVER: YouTube API request failed: %s", exc)
+        return []
+
+    results = []
+    for item in data.get("items", []):
+        snippet = item.get("snippet", {})
+        video_id = item.get("id", {}).get("videoId", "")
+        if not video_id:
+            continue
+        title = snippet.get("title", "Untitled")
+        channel = snippet.get("channelTitle", "")
+        thumbnail = snippet.get("thumbnails", {}).get("medium", {}).get("url", "")
+        url = f"https://www.youtube.com/watch?v={video_id}"
+        results.append({
+            "title": title,
+            "url": url,
+            "channel": channel or "YouTube",
+            "thumbnail": thumbnail,
+        })
+
+    return results
+
+
 # Ensure all user's PDFs are indexed
 def ensure_user_pdfs_indexed(user_id):
     conn = sqlite3.connect(DB_PATH)
@@ -185,39 +262,64 @@ def solver_page():
         session.clear()
         return redirect(url_for('signin.signin_page'))
 
+    # Original guard rail: require payment
     if user['payment_status'] != 'PAID':
         conn.close()
         flash("Please purchase a course plan to access the AI Doubt Solver.", "info")
         return redirect(url_for('plans.plans_page'))
 
     user_id = user['id']
-    
+
+    # Determine which courses the user has access to
+    purchased_courses = get_purchased_courses(user_id)
+    has_gate = has_course_access(user_id, 'GATE')
+    has_neet = has_course_access(user_id, 'NEET')
+    both_courses = has_gate and has_neet
+
+    # Determine active course from query param or default
+    course_param = request.args.get('course', '').strip().upper()
+    if both_courses:
+        # User has both: use query param or default to GATE
+        active_course = course_param if course_param in ('GATE', 'NEET') else 'GATE'
+    elif has_neet:
+        active_course = 'NEET'
+    elif has_gate:
+        active_course = 'GATE'
+    else:
+        # Fallback: shouldn't happen due to payment guard rail above
+        active_course = 'GATE'
+
     # Auto-index user PDFs
     ensure_user_pdfs_indexed(user_id)
     
     active_doubt = None
     if request.method == 'POST':
+        # Override active_course from hidden form field if present
+        form_course = request.form.get('active_course', '').strip().upper()
+        if form_course in ('GATE', 'NEET'):
+            active_course = form_course
+
         question = request.form.get("question", "").strip()
         if not question:
             conn.close()
             flash("Please enter a question.", "warning")
-            return redirect(url_for('doubt_solver.solver_page'))
+            return redirect(url_for('doubt_solver.solver_page', course=active_course))
 
-        # Check if user has uploaded PDFs
-        cursor.execute("SELECT COUNT(*) FROM uploaded_pdfs WHERE user_id=?", (user_id,))
+        # Check if user has uploaded PDFs for this specific course
+        cursor.execute("SELECT COUNT(*) FROM uploaded_pdfs WHERE user_id=? AND course=?", (user_id, active_course))
         pdf_count = cursor.fetchone()[0]
         if pdf_count == 0:
             conn.close()
-            flash("You haven't uploaded any study materials yet! Please upload a PDF first to search from your notes.", "warning")
-            return redirect(url_for('pdf_upload.upload_page'))
+            flash(f"You haven't uploaded any {active_course} study materials yet! Please upload a PDF first.", "warning")
+            return redirect(url_for('doubt_solver.solver_page', course=active_course))
 
-        # Perform Semantic Search
+        # Perform Semantic Search — only from PDFs matching the active course
         cursor.execute("""
             SELECT p.id, p.pdf_id, p.page_number, p.page_text, p.embedding, u.pdf_name, u.course
             FROM uploaded_pdf_pages p
             JOIN uploaded_pdfs u ON p.pdf_id = u.id
-            WHERE p.user_id=?
-        """, (user_id,))
+            WHERE p.user_id=? AND u.course=?
+        """, (user_id, active_course))
         pages = cursor.fetchall()
 
         if not pages:
@@ -314,8 +416,8 @@ Return ONLY the raw JSON string. Do not wrap in ```json or ```.
             chap_ref = "N/A"
             topic_ref = "N/A"
 
-        # Determine subject course category from PDF
-        subj = top_matches[0][1]['course'] if top_matches else "General"
+        # Determine subject course category from PDF — always use the active course
+        subj = active_course
 
         # Save to History
         cursor.execute("""
@@ -356,7 +458,14 @@ Return ONLY the raw JSON string. Do not wrap in ```json or ```.
         conn.commit()
         
         conn.close()
-        return redirect(url_for('doubt_solver.solver_page', active_doubt_id=doubt_id))
+        # Fetch related YouTube videos (education-focused)
+        youtube_videos = []
+        try:
+            youtube_videos = search_youtube_videos(question, course=active_course)
+        except Exception as exc:
+            logger.warning("DOUBT_SOLVER: YouTube search failed: %s", exc)
+
+        return redirect(url_for('doubt_solver.solver_page', active_doubt_id=doubt_id, course=active_course))
 
     # Handle GET request
     active_doubt_id = request.args.get("active_doubt_id")
@@ -374,15 +483,25 @@ Return ONLY the raw JSON string. Do not wrap in ```json or ```.
             else:
                 active_doubt['parsed_answer'] = None
 
-    # Fetch history (last 20 queries)
+    # Fetch related YouTube videos for active doubt (education-focused)
+    youtube_videos = []
+    if active_doubt:
+        try:
+            youtube_videos = search_youtube_videos(active_doubt['question'], course=active_course)
+        except Exception as exc:
+            logger.warning("DOUBT_SOLVER: YouTube search failed: %s", exc)
+
+    # Fetch history (last 20 queries) — filtered by active course
     cursor.execute("""
-        SELECT id, question, created_at, pdf_name, page_number
+        SELECT id, question, created_at, pdf_name, page_number, subject
         FROM ai_doubt_history
         WHERE user_id=?
         ORDER BY created_at DESC
         LIMIT 20
     """, (user_id,))
-    history = [dict(row) for row in cursor.fetchall()]
+    all_history = [dict(row) for row in cursor.fetchall()]
+    # Filter history to show only doubts relevant to the active course
+    history = [h for h in all_history if _matches_course(h.get('pdf_name', ''), h.get('subject', ''), active_course)]
 
     # Count of saved/bookmarked doubts
     cursor.execute("SELECT COUNT(*) FROM saved_answers WHERE user_id=?", (user_id,))
@@ -394,8 +513,13 @@ Return ONLY the raw JSON string. Do not wrap in ```json or ```.
         active_page='doubt_solver',
         user=user,
         active_doubt=active_doubt,
+        youtube_videos=youtube_videos,
         history=history,
-        saved_count=saved_count
+        saved_count=saved_count,
+        active_course=active_course,
+        has_gate=has_gate,
+        has_neet=has_neet,
+        both_courses=both_courses
     )
 
 # Bookmark doubt route
@@ -430,7 +554,8 @@ def bookmark_doubt(doubt_id):
                 flash("Doubt already bookmarked.", "info")
                 
     conn.close()
-    return redirect(url_for('doubt_solver.solver_page', active_doubt_id=doubt_id))
+    active_course = request.form.get('active_course', 'GATE').upper()
+    return redirect(url_for('doubt_solver.solver_page', active_doubt_id=doubt_id, course=active_course))
 
 # Saved Doubts Route
 @doubt_solver_bp.route('/saved', methods=['GET'])
@@ -488,7 +613,8 @@ def delete_doubt(doubt_id):
         flash("History entry deleted.", "success")
         
     conn.close()
-    return redirect(url_for('doubt_solver.solver_page'))
+    active_course = request.form.get('active_course', 'GATE').upper()
+    return redirect(url_for('doubt_solver.solver_page', course=active_course))
 
 # Clear all history
 @doubt_solver_bp.route('/clear-history', methods=['POST'])
@@ -508,7 +634,8 @@ def clear_history():
         flash("Doubt solver history cleared.", "success")
         
     conn.close()
-    return redirect(url_for('doubt_solver.solver_page'))
+    active_course = request.form.get('active_course', 'GATE').upper()
+    return redirect(url_for('doubt_solver.solver_page', course=active_course))
 
 # Delete saved doubt
 @doubt_solver_bp.route('/delete-saved/<int:saved_id>', methods=['POST'])

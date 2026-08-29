@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify, request
 from database import get_db
 from spaced_repetition import get_due_revisions
 from practice import get_weak_subjects
@@ -25,6 +25,15 @@ def progress_page():
         return redirect(url_for('signin.signin_page'))
 
     user_id = user['id']
+
+    # Determine course (from query param or user's default)
+    course_param = request.args.get('course', '').strip().upper()
+    if course_param in ('GATE', 'NEET'):
+        user_course = course_param
+    else:
+        user_course = user["selected_course"] or "GATE"
+        if user_course not in ("GATE", "NEET"):
+            user_course = "GATE"
 
     # 1. Study Time (from study_sessions)
     cursor.execute("SELECT SUM(duration_minutes) as total_min FROM study_sessions WHERE user_id = ?", (user_id,))
@@ -83,12 +92,13 @@ def progress_page():
         ]
     ]
         
-    # 2. Questions Solved & Accuracy
+    # 2. Questions Solved & Accuracy (filtered by course)
     cursor.execute("""
-        SELECT COUNT(*) as quiz_count, SUM(total_questions) as total_q, SUM(score) as correct_q, AVG(percentage) as avg_pct
-        FROM quiz_results
-        WHERE user_id = ?
-    """, (user_id,))
+        SELECT COUNT(*) as quiz_count, SUM(qr.total_questions) as total_q, SUM(qr.score) as correct_q, AVG(qr.percentage) as avg_pct
+        FROM quiz_results qr
+        JOIN uploaded_pdfs p ON qr.pdf_id = p.id
+        WHERE qr.user_id = ? AND p.course = ?
+    """, (user_id, user_course))
     quiz_summary = cursor.fetchone()
 
     total_quizzes = quiz_summary['quiz_count'] if quiz_summary and quiz_summary['quiz_count'] else 0
@@ -99,40 +109,41 @@ def progress_page():
 
     accuracy = round(quiz_summary['avg_pct']) if quiz_summary and quiz_summary['avg_pct'] else 0
     
-    # Total PDFs Uploaded
+    # Total PDFs Uploaded (filtered by course)
     cursor.execute("""
         SELECT COUNT(*) AS total_pdfs
         FROM uploaded_pdfs
-        WHERE user_id=?
-    """, (user_id,))
+        WHERE user_id=? AND course=?
+    """, (user_id, user_course))
 
     pdf_row = cursor.fetchone()
 
     total_pdfs = pdf_row["total_pdfs"] if pdf_row else 0
     
-    # Highest and Lowest Quiz Score
+    # Highest and Lowest Quiz Score (filtered by course)
     cursor.execute("""
         SELECT
-           MAX(percentage) AS highest_score,
-           MIN(percentage) AS lowest_score
-        FROM quiz_results
-        WHERE user_id=?
-    """, (user_id,))
+           MAX(qr.percentage) AS highest_score,
+           MIN(qr.percentage) AS lowest_score
+        FROM quiz_results qr
+        JOIN uploaded_pdfs p ON qr.pdf_id = p.id
+        WHERE qr.user_id=? AND p.course=?
+    """, (user_id, user_course))
 
     score_row = cursor.fetchone()
 
     highest_score = round(score_row["highest_score"]) if score_row["highest_score"] else 0
     lowest_score = round(score_row["lowest_score"]) if score_row["lowest_score"] else 0
 
-    # 3. Accuracy Trend (Last 5 Quizzes)
+    # 3. Accuracy Trend (Last 5 Quizzes, filtered by course)
     cursor.execute("""
         SELECT q.percentage, q.completed_at, p.pdf_name
         FROM quiz_results q
         JOIN uploaded_pdfs p ON q.pdf_id = p.id
-        WHERE q.user_id = ?
+        WHERE q.user_id = ? AND p.course = ?
         ORDER BY q.completed_at ASC
         LIMIT 5
-    """, (user_id,))
+    """, (user_id, user_course))
     trend_rows = cursor.fetchall()
     
     accuracy_trend = []
@@ -145,18 +156,19 @@ def progress_page():
                 "percentage": round(row['percentage'])
             })
 
-    # 4. Questions Solved trend (last 5 quizzes)
+    # 4. Questions Solved trend (last 5 quizzes, filtered by course)
     questions_solved_trend = []
     if not trend_rows:
         questions_solved_trend = []
     else:
         cursor.execute("""
-            SELECT score, total_questions
-            FROM quiz_results
-            WHERE user_id = ?
-            ORDER BY completed_at ASC
+            SELECT qr.score, qr.total_questions
+            FROM quiz_results qr
+            JOIN uploaded_pdfs p ON qr.pdf_id = p.id
+            WHERE qr.user_id = ? AND p.course = ?
+            ORDER BY qr.completed_at ASC
             LIMIT 5
-        """, (user_id,))
+        """, (user_id, user_course,))
         for idx, row in enumerate(cursor.fetchall()):
             questions_solved_trend.append({
                 "label": f"Quiz {idx+1}",
@@ -164,14 +176,14 @@ def progress_page():
                 "total": row['total_questions']
             })
 
-    # 5. Quiz History Table
+    # 5. Quiz History Table (filtered by course)
     cursor.execute("""
         SELECT q.id, q.score, q.total_questions, q.percentage, q.completed_at, p.pdf_name, p.course
         FROM quiz_results q
         JOIN uploaded_pdfs p ON q.pdf_id = p.id
-        WHERE q.user_id = ?
+        WHERE q.user_id = ? AND p.course = ?
         ORDER BY q.completed_at DESC
-    """, (user_id,))
+    """, (user_id, user_course))
     history_rows = cursor.fetchall()
     quiz_history = []
     
@@ -186,8 +198,8 @@ def progress_page():
             "completed_at": row['completed_at']
         })
 
-    # 6. Due Revisions (spaced repetition)
-    due_revisions = get_due_revisions(user_id)
+    # 6. Due Revisions (spaced repetition, filtered by course)
+    due_revisions = get_due_revisions(user_id, course=user_course)
     # Add days_overdue to each revision for display
     from datetime import datetime
     today = datetime.now().strftime("%Y-%m-%d")
@@ -200,9 +212,6 @@ def progress_page():
             rev["days_overdue"] = 0
 
     # 7. Weak Subjects (loaded async — no API calls here)
-    user_course = user["selected_course"] or "GATE"
-    if user_course not in ("GATE", "NEET"):
-        user_course = "GATE"
     weak_subjects = get_weak_subjects(user_id, user_course, limit=5)
     # Attach empty resources list — filled by the async endpoint
     for subj in weak_subjects:
@@ -254,9 +263,14 @@ def weak_subjects_api():
         return jsonify({"error": "user not found"}), 404
 
     user_id = user["id"]
-    user_course = user["selected_course"] or "GATE"
-    if user_course not in ("GATE", "NEET"):
-        user_course = "GATE"
+    # Allow course switching via query parameter
+    course_param = request.args.get('course', '').strip().upper()
+    if course_param in ('GATE', 'NEET'):
+        user_course = course_param
+    else:
+        user_course = user["selected_course"] or "GATE"
+        if user_course not in ("GATE", "NEET"):
+            user_course = "GATE"
 
     weak_subjects = get_weak_subjects(user_id, user_course, limit=5)
 

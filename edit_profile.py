@@ -41,8 +41,7 @@ def edit_profile():
 
         name = request.form.get("name")
         email = request.form.get("email")
-        phone = request.form.get("phone")
-        college = request.form.get("college")
+
         department = request.form.get("department")
         year = request.form.get("year")
 
@@ -71,16 +70,12 @@ def edit_profile():
             SET
                 name=?,
                 email=?,
-                phone=?,
-                college=?,
                 department=?,
                 year=?
             WHERE id=?
         """, (
             name,
             email,
-            phone,
-            college,
             department,
             year,
             user["id"]

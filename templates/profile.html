@@ -53,13 +53,6 @@
                     <div class="profile-avatar-fallback" style="display:none;">
                         <i class="fas fa-user"></i>
                     </div>
-                    <form method="POST" action="{{ url_for('profile.upload_photo') }}" enctype="multipart/form-data" class="photo-upload-form">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <label for="photo-input" class="photo-upload-btn" title="Change photo">
-                            <i class="fas fa-camera"></i>
-                        </label>
-                        <input type="file" id="photo-input" name="photo" accept="image/*" style="display:none;" onchange="this.form.submit();">
-                    </form>
                 </div>
 
                 <div class="profile-details">
@@ -72,18 +65,8 @@
                     </span>
 
                     <p>
-                        <i class="fa-solid fa-building-columns"></i>
-                        {{ college }}
-                    </p>
-
-                    <p>
                         <i class="fa-solid fa-envelope"></i>
                         {{ email }}
-                    </p>
-
-                    <p>
-                        <i class="fa-solid fa-phone"></i>
-                        {{ phone }}
                     </p>
 
                 </div>
