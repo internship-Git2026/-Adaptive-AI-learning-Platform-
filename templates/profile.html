@@ -131,7 +131,7 @@
                 <i class="fa-solid fa-question-circle"></i>
                 AI Doubt Solver Analytics
             </h2>
-            <div class="progress-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="progress-grid doubt-grid">
                 <div class="progress-card">
                     <i class="fa-solid fa-comment-dots" style="color: #2563eb;"></i>
                     <h3>Questions Asked</h3>
@@ -224,16 +224,7 @@
 
 <script src="{{ url_for('static', filename='settings.js') }}"></script>
 
-<script>
-    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-        document.getElementById('appSidebar').classList.add('open');
-        document.getElementById('sidebarBackdrop').classList.add('active');
-    });
-    document.getElementById('sidebarBackdrop')?.addEventListener('click', () => {
-        document.getElementById('appSidebar').classList.remove('open');
-        document.getElementById('sidebarBackdrop').classList.remove('active');
-    });
-</script>
+<!-- Sidebar toggle handled centrally in sidebar.html -->
 
 </body>
 </html>

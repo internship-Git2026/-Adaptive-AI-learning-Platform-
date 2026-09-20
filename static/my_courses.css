@@ -407,3 +407,12 @@
 .btn-module-action.neet-btn:hover {
   background-color: #059669;
 }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 768px) {
+  .course-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+  .courses-header h1 { font-size: 1.7rem; }
+}
+@media (max-width: 480px) {
+  .course-grid { grid-template-columns: 1fr; }
+}

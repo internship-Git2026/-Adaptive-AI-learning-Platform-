@@ -196,3 +196,9 @@ flex-direction:column;
 }
 
 }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 480px){
+.result-card{padding:1.25rem;}
+.score-circle{width:110px;height:110px;}
+}

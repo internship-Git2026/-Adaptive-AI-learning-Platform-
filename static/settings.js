@@ -41,19 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ================= SIDEBAR =================
-  const sidebarToggle = document.getElementById("sidebarToggle");
-  const sidebar = document.getElementById("appSidebar");
-  const backdrop = document.getElementById("sidebarBackdrop");
-
-  if (sidebarToggle && sidebar && backdrop) {
-    sidebarToggle.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
-      backdrop.classList.toggle("active");
-    });
-
-    backdrop.addEventListener("click", () => {
-      sidebar.classList.remove("open");
-      backdrop.classList.remove("active");
-    });
-  }
+  // Handled centrally in templates/sidebar.html (single toggle binding
+  // for all devices). Kept out of here to avoid double-toggle on pages
+  // that load both sidebar.html and settings.js.
 });

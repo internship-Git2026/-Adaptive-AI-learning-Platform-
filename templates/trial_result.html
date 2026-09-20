@@ -12,8 +12,8 @@
   <div class="trial-container" style="max-width: 750px;">
     
     <div style="margin-bottom: 1.5rem;">
-      <a href="{{ url_for('dashboard.dashboard_page') }}" style="color: var(--primary-blue, #2563eb); font-weight: 700; text-decoration: none; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.4rem;">
-        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      <a href="{{ url_for('main.home') }}" style="color: var(--primary-blue, #2563eb); font-weight: 700; text-decoration: none; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+        <i class="fas fa-arrow-left"></i> Back to Home
       </a>
     </div>
 
@@ -103,7 +103,7 @@
       <p>Unlock our adaptive learning suite. Ingest unlimited books/materials and generate endless AI exam questions.</p>
       
       <div class="premium-actions">
-        <a href="{{ url_for('dashboard.dashboard_page') }}" class="btn-buy" style="background: #2563eb; text-decoration: none;"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <a href="{{ url_for('main.home') }}" class="btn-buy" style="background: #2563eb; text-decoration: none;"><i class="fas fa-arrow-left"></i> Back to Home</a>
         <a href="{{ url_for('signup.signup_page', course='GATE') }}" class="btn-buy"><i class="fas fa-graduation-cap"></i> Buy GATE Suite</a>
         <a href="{{ url_for('signup.signup_page', course='NEET') }}" class="btn-buy neet-btn"><i class="fas fa-stethoscope"></i> Buy NEET Suite</a>
         <a href="{{ url_for('signin.signin_page') }}" class="btn-signin-redirect">Sign In</a>

@@ -43,9 +43,12 @@ def start_trial(course):
         trial = cursor.fetchone()
         conn.close()
         if trial:
-            if trial['trial_used'] or (trial['pdf_uploaded'] and trial['quiz_generated']):
-                return redirect(url_for('trial.trial_used_page'))
-            return redirect(url_for('trial.dashboard'))
+            if trial['course'] == course:
+                # Same course: show used page or resume in-progress trial
+                if trial['trial_used'] or (trial['pdf_uploaded'] and trial['quiz_generated']):
+                    return redirect(url_for('trial.trial_used_page'))
+                return redirect(url_for('trial.dashboard'))
+            # Different course: fall through to create a new trial
 
     conn = get_db()
     cursor = conn.cursor()
@@ -60,18 +63,20 @@ def start_trial(course):
         )
         prior = cursor.fetchone()
         if prior:
-            used = prior['trial_used'] or (prior['pdf_uploaded'] and prior['quiz_generated'])
-            if used:
+            if prior['course'] == course:
+                # Same course: block used or resume in-progress
+                used = prior['trial_used'] or (prior['pdf_uploaded'] and prior['quiz_generated'])
+                if used:
+                    conn.close()
+                    flash("Your free trial has already been used on this device.", "warning")
+                    return redirect(url_for('trial.trial_used_page'))
                 conn.close()
-                flash("Your free trial has already been used on this device.", "warning")
-                return redirect(url_for('trial.trial_used_page'))
-            # In-progress trial from this device: resume it instead of duplicating
-            conn.close()
-            session["trial_id"] = prior['trial_id']
-            response = make_response(redirect(url_for('trial.dashboard')))
-            response.set_cookie("trial_id", prior['trial_id'], max_age=30*24*60*60, httponly=True)
-            response.set_cookie("browser_token", prior['browser_token'], max_age=30*24*60*60, httponly=True)
-            return response
+                session["trial_id"] = prior['trial_id']
+                response = make_response(redirect(url_for('trial.dashboard')))
+                response.set_cookie("trial_id", prior['trial_id'], max_age=30*24*60*60, httponly=True)
+                response.set_cookie("browser_token", prior['browser_token'], max_age=30*24*60*60, httponly=True)
+                return response
+            # Different course: fall through to create a new trial
     else:
         # No device fingerprint (JS disabled/blocked): fall back to a per-IP cap
         cursor.execute("""

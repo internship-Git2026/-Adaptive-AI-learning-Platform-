@@ -143,3 +143,10 @@ body {
 .btn-primary:hover { background: #1d4ed8; }
 .btn-secondary { background: #eff6ff; color: #334155; }
 .btn-secondary:hover { background: #dbeafe; }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 480px) {
+  body { padding: 1rem; }
+  .quiz-container, .blocker-card { padding: 1.5rem; border-radius: 1.25rem; }
+  .quiz-header { flex-wrap: wrap; gap: 0.5rem; }
+}

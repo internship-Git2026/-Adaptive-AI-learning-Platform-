@@ -606,6 +606,13 @@ gap:20px;
 
 }
 
+/* Desktop: doubt analytics row (moved from inline style; PC identical) */
+.doubt-grid{
+
+grid-template-columns:repeat(4,1fr);
+
+}
+
 .progress-card{
 
 background:linear-gradient(145deg,#ffffff,#f9fbff);
@@ -2224,4 +2231,72 @@ color:white;
 
     margin-bottom:15px;
 
+}
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) =====
+   Everything below lives inside max-width media queries, so the
+   desktop (PC) rendering is byte-for-byte identical. */
+@media (max-width: 1024px) {
+  .progress-grid { grid-template-columns: repeat(3, 1fr); }
+  .doubt-grid { grid-template-columns: repeat(2, 1fr); }
+  .profile-content { grid-template-columns: 1fr; }
+  .account-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  /* Header card: stack avatar above details */
+  .profile-header { padding: 16px; }
+  .profile-card { flex-direction: column; text-align: center; gap: 20px; padding: 28px 20px; }
+  .profile-image, .profile-image img, .profile-avatar-fallback { width: 128px; height: 128px; }
+  .profile-image { margin: 0 auto; }
+  .profile-details h1 { font-size: 26px; }
+  .profile-details p { font-size: 15px; word-break: break-word; }
+  .profile-topbar h2 { font-size: 1.35rem !important; }
+  .settings-btn { width: 44px; height: 44px; font-size: 19px; flex-shrink: 0; }
+  /* Learning progress grids */
+  .learning-progress { margin: 20px 16px; }
+  .section-title { font-size: 21px; margin-bottom: 16px; }
+  .progress-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .doubt-grid { grid-template-columns: repeat(2, 1fr); }
+  .progress-card { padding: 22px 14px; }
+  .progress-card i { font-size: 32px; }
+  .progress-card h1 { font-size: 30px; }
+  .progress-card h3 { font-size: 15px; }
+  .doubt-grid h1 { min-height: 0 !important; font-size: 1.05rem !important; }
+  /* Content / activity */
+  .profile-content { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
+  .activity-card, .info-card { padding: 20px; }
+  .activity-header h2 { font-size: 21px; }
+  .activity-item { padding: 14px; gap: 12px; }
+  .activity-icon { width: 46px; height: 46px; min-width: 46px; font-size: 18px; }
+  .activity-info h4 { font-size: 16px; }
+  .activity-info p { font-size: 13.5px; }
+  .account-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Edit profile */
+  .edit-profile-container { padding: 24px 14px; }
+  .edit-profile-card { padding: 26px 20px; }
+  .edit-profile-card h1 { font-size: 24px; margin-bottom: 24px; }
+  .edit-photo-section { flex-direction: column; text-align: center; }
+  .button-group { flex-direction: column; gap: 12px; }
+  /* Settings panel: fluid width, never wider than the phone */
+  .settings-panel { width: min(360px, calc(100vw - 32px)); right: -105%; padding: 22px; }
+  .settings-panel.open { right: 0; }
+  .setting-card { padding: 18px; }
+  .setting-card h3 { font-size: 18px; }
+  .setting-card p { font-size: 14px; margin-left: 0; }
+  /* Add-course card */
+  .add-course-container { padding: 24px 14px; }
+  .add-course-card { padding: 26px 20px; }
+  .course-box { flex-direction: column; align-items: stretch; gap: 14px; }
+}
+@media (max-width: 480px) {
+  .progress-grid, .doubt-grid { grid-template-columns: 1fr; }
+  .account-grid { grid-template-columns: 1fr; }
+  .profile-details h1 { font-size: 22px; }
+  .role { font-size: 13px; padding: 6px 12px; }
+  .section-title { font-size: 19px; }
+  .progress-card h1 { font-size: 28px; }
+  .activity-item { align-items: flex-start; }
+  .close-btn { width: 44px; height: 44px; }
+  .save-btn, .cancel-btn { width: 100%; }
+  .modal-box { width: calc(100vw - 32px); }
 }

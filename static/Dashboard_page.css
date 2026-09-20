@@ -491,3 +491,21 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 768px) {
+  .welcome-text h1 { font-size: 1.6rem; }
+  .card-header-bar { flex-wrap: wrap; gap: 0.5rem; }
+  .bar-chart-container { overflow-x: auto; gap: 0.5rem; }
+  .bar-column { min-width: 36px; }
+}
+@media (max-width: 480px) {
+  .welcome-banner { padding: 1.25rem; }
+  .welcome-text h1 { font-size: 1.4rem; }
+  .welcome-text p { font-size: 0.95rem; }
+  .welcome-badges { flex-wrap: wrap; }
+  .stat-card { padding: 1rem; }
+  .stat-info h3 { font-size: 1.35rem; }
+  .goal-circle-wrapper { width: 120px; height: 120px; }
+  .bar-tooltip { display: none; }
+}

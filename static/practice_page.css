@@ -780,3 +780,28 @@
     max-width: 95%;
   }
 }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 768px) {
+  .topics-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  /* Ask AI: roomier bubbles, wrapping public header */
+  .chat-msg { max-width: 92%; }
+  .askai-public-header { flex-wrap: wrap; padding: 1rem; row-gap: 0.75rem; }
+  .practice-header { padding: 1.4rem 1.25rem; }
+}
+@media (max-width: 480px) {
+  .topics-grid { grid-template-columns: 1fr; }
+  .practice-header { flex-wrap: wrap; gap: 0.75rem; padding: 1.25rem 1rem; }
+  .practice-header h1 { font-size: 1.2rem; }
+  .practice-header-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1.2rem; }
+  /* Ask AI: stack input row, full-width Ask button */
+  .chat-input-row { flex-direction: column; }
+  .chat-input-row textarea { width: 100%; box-sizing: border-box; }
+  .chat-input-row .btn-ai { width: 100%; justify-content: center; }
+  .suggestion-chip { max-width: 100%; font-size: 0.78rem; }
+  .suggestion-chip i { flex-shrink: 0; }
+  .askai-public-header { padding: 0.85rem 1rem; }
+  .askai-public-signup { font-size: 0.8rem; padding: 0.55rem 0.85rem; }
+  .askai-public-link { font-size: 0.82rem; padding: 0.5rem 0.75rem; }
+  .askai-public-main { padding: 1.25rem 0.75rem; }
+}

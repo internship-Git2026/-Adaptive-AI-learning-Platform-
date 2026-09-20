@@ -623,3 +623,12 @@
   color: #1e293b;
   transform: translateY(-2px);
 }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 768px) {
+  .metadata-grid { grid-template-columns: 1fr; }
+  .upload-card { padding: 1.25rem; }
+}
+@media (max-width: 480px) {
+  .file-list-item { flex-wrap: wrap; }
+}

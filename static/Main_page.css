@@ -932,5 +932,20 @@ h1, h2, h3, .logo, .section-title {
   .nav-actions { justify-content: center; gap: 1.2rem; }
   .hero-left h1 { font-size: 2.2rem; }
   .stats-grid { grid-template-columns: 1fr; }
-  .floating-ai-popup { width: 280px; right: -10px; }
+  /* Popup is absolute inside a 62px fixed container, so viewport units
+     mis-resolve there. Anchor it to the viewport instead on phones. */
+  .floating-ai-container { bottom: 1rem; right: 1rem; }
+  .floating-ai-popup {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 96px;
+    width: auto;
+    max-width: 420px;
+    margin: 0 auto;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+  .popup-body { padding: 1.25rem; }
+  body::before, body::after { width: 280px; }
 }

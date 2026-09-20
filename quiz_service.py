@@ -51,6 +51,12 @@ def save_ai_quiz(pdf_id, extracted_text, course=None):
             "QUIZ_PIPELINE: pdf=%s generation failed at stage '%s': %s",
             pdf_id, exc.stage, exc.message,
         )
+        if exc.stage == "groq_auth":
+            return False, (
+                "AI service is unavailable: the server's Groq API key is "
+                "invalid or expired. Please ask the administrator to set a "
+                "valid GROQ_API_KEY and restart the app."
+            )
         return False, "Failed to generate AI quiz. Please try again."
     except Exception as exc:
         logger.error(

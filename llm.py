@@ -8,12 +8,21 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# Model is configurable via GROQ_MODEL. The default (llama-3.3-70b-versatile)
-# is a strong, fast, widely-available Groq model on the free tier. The key is
-# never logged anywhere in this module.
+# Model is configurable via GROQ_MODEL. The key is never logged anywhere
+# in this module.
 GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b").strip()
 
 _client = None
+
+
+class GroqAuthError(Exception):
+    """Raised when Groq rejects the request for authentication reasons.
+
+    This is a distinct, non-transient failure (bad/revoked/expired API key).
+    It subclasses Exception so existing generic handlers keep working, but
+    callers can catch it explicitly to show a clear "key invalid" message
+    instead of a misleading "try again" one. Retrying is pointless.
+    """
 
 
 def _get_client():
@@ -41,6 +50,25 @@ def generate(prompt, temperature=0.7, max_tokens=None):
     if max_tokens is not None:
         kwargs["max_tokens"] = max_tokens
 
-    response = _get_client().chat.completions.create(**kwargs)
+    try:
+        response = _get_client().chat.completions.create(**kwargs)
+    except Exception as exc:
+        if _is_auth_error(exc):
+            raise GroqAuthError(
+                "Groq rejected the API key (invalid, expired, or revoked). "
+                "Set a valid GROQ_API_KEY in .env and restart the app."
+            ) from exc
+        raise
     content = response.choices[0].message.content
     return (content or "").strip()
+
+
+def _is_auth_error(exc):
+    """True if the exception looks like an auth failure (HTTP 401)."""
+    status = getattr(exc, "status_code", None)
+    if status == 401:
+        return True
+    text = str(exc).lower()
+    return "invalid_api_key" in text or (
+        "401" in text and ("unauthorized" in text or "authentication" in text)
+    )

@@ -534,3 +534,8 @@ body {
     justify-content: center;
   }
 }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
+}

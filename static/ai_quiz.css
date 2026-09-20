@@ -6,7 +6,9 @@ body{
 }
 
 .container{
-    width:850px;
+    max-width:850px;
+    width:100%;
+    box-sizing:border-box;
     margin:auto;
     background:white;
     border-radius:15px;
@@ -115,4 +117,17 @@ background:#f59e0b !important;
 
 background:#dc2626 !important;
 
+}
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 768px) {
+  body { padding: 16px; }
+  .container { padding: 20px; }
+  .question { font-size: 20px; }
+  .option { font-size: 16px; padding: 14px; }
+  .quiz-header { flex-wrap: wrap; gap: 0.75rem; }
+}
+@media (max-width: 480px) {
+  .question { font-size: 18px; }
+  .submit-btn { width: 100%; padding: 14px; }
 }

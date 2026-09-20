@@ -12,6 +12,12 @@
 
 <div class="container" style="max-width: 750px; margin: 0 auto; position: relative;">
 
+    <div style="margin-bottom: 1.25rem;">
+      <a href="{{ url_for('main.home') }}" style="color: var(--primary-blue, #2563eb); font-weight: 700; text-decoration: none; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </a>
+    </div>
+
     {% if not is_locked %}
         <!-- ===== ACTIVE QUIZ SECTION (Q1-Q5) ===== -->
         <div class="quiz-header">

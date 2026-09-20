@@ -348,3 +348,15 @@ body{
     background:#ECFDF5;
     color:#059669;
 }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 768px) {
+  .notification-header{flex-wrap:wrap;gap:0.75rem;}
+  .notification-header h1{font-size:26px;}
+  .notification-card{padding:16px;}
+  .empty-box{padding:32px 20px;}
+}
+@media (max-width: 480px) {
+  .notification-icon{width:44px;height:44px;font-size:22px;}
+  .notification-title{font-size:17px;}
+}

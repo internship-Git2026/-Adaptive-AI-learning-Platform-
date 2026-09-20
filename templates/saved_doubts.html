@@ -256,16 +256,6 @@
     </main>
   </div>
 
-  <script>
-    // Handle mobile sidebar toggles if needed
-    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-      document.getElementById('appSidebar').classList.add('open');
-      document.getElementById('sidebarBackdrop').classList.add('active');
-    });
-    document.getElementById('sidebarBackdrop')?.addEventListener('click', () => {
-      document.getElementById('appSidebar').classList.remove('open');
-      document.getElementById('sidebarBackdrop').classList.remove('active');
-    });
-  </script>
+  <!-- Sidebar toggle handled centrally in sidebar.html -->
 </body>
 </html>

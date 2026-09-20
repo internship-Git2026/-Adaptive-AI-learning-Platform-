@@ -192,3 +192,10 @@ body{
     transform:translateY(-2px);
 
 }
+
+/* ===== MOBILE + TABLET PATCH (PC base untouched) ===== */
+@media (max-width: 480px){
+    body{padding:16px;}
+    .settings-card{padding:22px;}
+    .options label{min-width:100%;}
+}
