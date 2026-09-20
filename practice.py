@@ -504,6 +504,10 @@ def ask_ai():
                 logger.error("ASK_AI: request failed: %s", exc)
                 flash("The AI assistant could not be reached. Please try again.", "error")
                 reply = None
+            else:
+                if not (reply or "").strip():
+                    flash("The AI returned an empty answer. Please try again.", "warning")
+                    reply = None
             if reply:
                 history = history + [{"q": question, "a": reply}]
                 session[_ASK_AI_HISTORY_KEY] = history[-8:]

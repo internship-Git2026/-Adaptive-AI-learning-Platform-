@@ -1,5 +1,16 @@
 <!-- Ask AI chat body (shared between logged-in and public layouts) -->
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert-flash {{ category }}">
+        <i class="fas fa-circle-info"></i>
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 <div class="practice-header" style="margin-top: 0;">
   <div class="practice-header-icon" style="color:#a78bfa;"><i class="fas fa-robot"></i></div>
   <div>

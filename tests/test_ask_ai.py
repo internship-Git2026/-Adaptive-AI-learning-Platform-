@@ -48,6 +48,20 @@ def test_study_query_uses_shared_llm(monkeypatch):
     assert "Compiler" in seen["prompt"]
 
 
+def test_ask_ai_empty_reply_flashes_warning(monkeypatch):
+    from tests.conftest import make_user, login, set_csrf
+
+    uid = make_user("ask_empty@example.com")
+    c = __import__("Main_page").app.test_client()
+    login(c, "ask_empty@example.com", uid, "tok")
+    set_csrf(c, "tok")
+    monkeypatch.setattr(practice, "generate_ask_ai_reply", lambda *a, **k: "   ")
+    html = c.post(
+        "/practice/ask-ai", data={"question": "Hi?", "csrf_token": "tok"}
+    ).get_data(as_text=True)
+    assert "empty answer" in html
+
+
 def test_study_query_falls_back_on_llm_failure(monkeypatch):
     def bomb(*a, **k):
         raise RuntimeError("both providers down")
