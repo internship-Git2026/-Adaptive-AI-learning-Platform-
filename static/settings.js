@@ -6,14 +6,22 @@ document.addEventListener("DOMContentLoaded", () => {
   if (openBtn && settingsContainer) {
     openBtn.addEventListener("click", () => {
       showSettingsToast("Opening settings…");
-      fetch("/settings/", { cache: "no-store" })
+      fetch("/settings/", { cache: "no-store", credentials: "same-origin" })
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP Error: ${response.status}`);
           }
+          if (response.redirected && response.url.indexOf("signin") !== -1) {
+            // Session expired: the server bounced us to the login page.
+            window.location.href = "/signin/";
+            return null;
+          }
           return response.text();
         })
         .then((html) => {
+          if (html === null) {
+            return; // Redirect already issued above.
+          }
           settingsContainer.innerHTML = html;
 
           const panel = document.getElementById("settingsPanel");
