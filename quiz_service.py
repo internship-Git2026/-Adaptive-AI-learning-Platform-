@@ -57,6 +57,18 @@ def save_ai_quiz(pdf_id, extracted_text, course=None):
                 "invalid or expired. Please ask the administrator to set a "
                 "valid GROQ_API_KEY and restart the app."
             )
+        if exc.stage == "groq_connection":
+            return False, (
+                "AI service is unreachable from the server (network error). "
+                "If hosted on PythonAnywhere's free tier, api.groq.com may "
+                "not be whitelisted — otherwise check the server's internet "
+                "connection and try again."
+            )
+        if exc.stage == "gemini_quota":
+            return False, (
+                "Today's free AI limit is reached (resets at midnight "
+                "Pacific time). Please try generating the quiz again later."
+            )
         return False, "Failed to generate AI quiz. Please try again."
     except Exception as exc:
         logger.error(

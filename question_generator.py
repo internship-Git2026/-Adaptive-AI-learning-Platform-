@@ -4,7 +4,13 @@ import logging
 import re
 
 from dotenv import load_dotenv
-from llm import GROQ_MODEL, GroqAuthError, generate
+from llm import (
+    GROQ_MODEL,
+    GeminiQuotaError,
+    GroqAuthError,
+    GroqConnectionError,
+    generate,
+)
 from gate_course import GATE_SUBJECTS, NEET_SUBJECTS
 
 # Load .env
@@ -313,6 +319,16 @@ Study Material:
             # Non-transient: the API key is dead. Don't waste retries.
             logger.error("QUIZ_PIPELINE: Groq request = rejected (bad API key)")
             raise QuizGenerationError("groq_auth", str(exc)) from exc
+        except GroqConnectionError as exc:
+            # Deterministic from this server (firewall/proxy/DNS). Retrying
+            # inside this request only stacks timeout delays.
+            logger.error("QUIZ_PIPELINE: Groq request = unreachable (%s)", exc)
+            raise QuizGenerationError("groq_connection", str(exc)) from exc
+        except GeminiQuotaError as exc:
+            # Free-tier daily quota spent; it resets at midnight Pacific.
+            # Retrying now cannot succeed.
+            logger.error("QUIZ_PIPELINE: Gemini quota exhausted")
+            raise QuizGenerationError("gemini_quota", str(exc)) from exc
         except Exception as exc:
             logger.error("QUIZ_PIPELINE: Groq request = failed (attempt %d): %s", attempt + 1, _redact(exc))
             last_error = exc
@@ -421,5 +437,119 @@ Extracted Text (first 4000 characters):
         logger.error("VALIDATION_PIPELINE: parsing = failed (%s): %s", exc.stage, exc.message)
     except Exception as e:
         logger.error("VALIDATION_PIPELINE: request = failed: %s", _redact(e))
-    # Fallback to allow if the validation service is unavailable.
-    return True, "Validation bypassed due to service status."
+    # Groq unreachable: run a conservative local keyword check instead of a
+    # blind bypass, so obviously wrong-course or non-academic PDFs are still
+    # rejected. Only confident mismatches are rejected; anything ambiguous
+    # is allowed through.
+    return _local_course_check(text, course)
+
+
+# Extra engineering/tech-domain signals beyond the GATE subject keywords, so
+# software/engineering material uploaded to NEET is still caught locally.
+_TECH_EXTRA_KEYWORDS = [
+    "machine learning",
+    "artificial intelligence",
+    "neural network",
+    "deep learning",
+    "data science",
+    "software engineering",
+    "programming",
+    "python",
+    "engineering",
+    "technology",
+]
+
+# Signals of non-academic documents (resumes, corporate paperwork, ...).
+_NON_ACADEMIC_KEYWORDS = [
+    "curriculum vitae",
+    "work experience",
+    "career objective",
+    "expected salary",
+    "marital status",
+    "hobbies",
+    "linkedin",
+    "pay slip",
+    "invoice",
+    "quarterly report",
+    "profit and loss",
+    "balance sheet",
+    "marketing plan",
+]
+
+
+def _count_keyword_hits(sample, keywords):
+    """Count how many distinct keywords appear as whole words in `sample`."""
+    hits = 0
+    for keyword in keywords:
+        if re.search(r"\b" + re.escape(keyword.lower()) + r"\b", sample):
+            hits += 1
+    return hits
+
+
+def _subject_vocab(course):
+    """Flatten subject names + keywords for a course into one list."""
+    vocab = []
+    for subject in SUBJECTS_BY_COURSE.get(course, []):
+        vocab.append(subject["name"].lower())
+        vocab.extend(kw.lower() for kw in subject["keywords"])
+    return vocab
+
+
+def _local_course_check(text, course):
+    """Conservative offline replacement for AI validation.
+
+    Rejects only confident mismatches:
+    - 2+ non-academic signals (resume/corporate paperwork), or
+    - 3+ opposite-domain signals with zero same-domain signals.
+    Everything else is allowed. Returns (is_valid, reason).
+    """
+    sample = (text or "")[:MAX_VALIDATION_CHARS].lower()
+    if not sample.strip():
+        return False, "No readable text found for validation."
+
+    if _count_keyword_hits(sample, _NON_ACADEMIC_KEYWORDS) >= 2:
+        logger.info("VALIDATION_PIPELINE: local check = rejected (non-academic)")
+        return False, (
+            "Rejected by basic check: the document does not look like "
+            "study material."
+        )
+
+    gate_vocab = _subject_vocab("GATE")
+    # Biology-only vocabulary (zoology + botany). Physics/chemistry overlap
+    # with engineering, so they are not used as a NEET signal here.
+    bio_vocab = []
+    for subject in SUBJECTS_BY_COURSE.get("NEET", []):
+        if subject.get("key") in ("zoology", "botany"):
+            bio_vocab.append(subject["name"].lower())
+            bio_vocab.extend(kw.lower() for kw in subject["keywords"])
+
+    if course == "NEET":
+        bio_hits = _count_keyword_hits(sample, bio_vocab)
+        tech_hits = _count_keyword_hits(sample, gate_vocab + _TECH_EXTRA_KEYWORDS)
+        if bio_hits == 0 and tech_hits >= 3:
+            logger.info(
+                "VALIDATION_PIPELINE: local check = rejected "
+                "(tech content in NEET: tech=%d bio=%d)",
+                tech_hits, bio_hits,
+            )
+            return False, (
+                "Rejected by basic check: the material looks like "
+                "engineering/technical content, not NEET "
+                "(Physics/Chemistry/Biology)."
+            )
+    elif course == "GATE":
+        gate_hits = _count_keyword_hits(sample, gate_vocab)
+        bio_hits = _count_keyword_hits(sample, bio_vocab)
+        if gate_hits == 0 and bio_hits >= 3:
+            logger.info(
+                "VALIDATION_PIPELINE: local check = rejected "
+                "(bio content in GATE: bio=%d gate=%d)",
+                bio_hits, gate_hits,
+            )
+            return False, (
+                "Rejected by basic check: the material looks like "
+                "biology/medical content, not GATE engineering."
+            )
+
+    logger.info("VALIDATION_PIPELINE: local check = allowed (AI unavailable)")
+    return True, "Accepted by basic local check (AI validation unavailable)."
