@@ -30,10 +30,14 @@ _cache = {}
 _CACHE_TTL = 6 * 3600  # seconds
 
 
-def _get_groq_client():
-    """Lazy-init Groq client (reuses the project's existing one)."""
-    from llm import _get_client
-    return _get_client()
+def _generate_search_query(prompt):
+    """Generate a search query via the shared LLM layer.
+
+    Goes through llm.generate so the Groq -> Gemini fallback applies;
+    raises on failure so the caller can use its keyword fallback.
+    """
+    from llm import generate as llm_generate
+    return llm_generate(prompt, temperature=0.3, max_tokens=60)
 
 
 def _build_search_query(course, subject_key):
@@ -56,18 +60,11 @@ Return ONLY the search query text. No quotes, no explanation.
 Example output: GATE data structures algorithms NPTEL playlist"""
 
     try:
-        client = _get_groq_client()
-        response = client.chat.completions.create(
-            model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-            max_tokens=60,
-        )
-        query = (response.choices[0].message.content or "").strip().strip('"').strip("'")
+        query = (_generate_search_query(prompt) or "").strip().strip('"').strip("'")
         if query:
             return query
     except Exception as exc:
-        logger.warning("STUDY_RESOURCES: Groq query generation failed: %s", exc)
+        logger.warning("STUDY_RESOURCES: LLM query generation failed: %s", exc)
 
     # Fallback: simple keyword query
     return f"{course} {subject_info['name']} tutorial playlist"

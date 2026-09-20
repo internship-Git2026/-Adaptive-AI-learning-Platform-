@@ -16,7 +16,7 @@ from flask import (
 from database import get_db
 from course_access import has_course_access
 from gate_course import GATE_SUBJECTS, NEET_SUBJECTS
-from llm import GROQ_MODEL, _get_client, generate
+from llm import generate
 from question_generator import _extract_json, _normalise_question, QuizGenerationError
 from spaced_repetition import schedule_review
 
@@ -474,20 +474,18 @@ _ASK_AI_HISTORY_KEY = "ask_ai_history"
 
 
 def generate_ask_ai_reply(question, history):
-    """Build the platform-only assistant reply for `question`."""
-    messages = [{"role": "system", "content": _ASK_AI_SYSTEM}]
-    for turn in history[-6:]:
-        messages.append({"role": "user", "content": turn["q"]})
-        messages.append({"role": "assistant", "content": turn["a"]})
-    messages.append({"role": "user", "content": question})
+    """Build the platform-only assistant reply for `question`.
 
-    response = _get_client().chat.completions.create(
-        model=GROQ_MODEL,
-        messages=messages,
-        temperature=0.6,
-    )
-    content = response.choices[0].message.content
-    return (content or "").strip()
+    The conversation is flattened into a single prompt and sent through
+    llm.generate so the Groq -> Gemini fallback applies here too.
+    """
+    parts = [_ASK_AI_SYSTEM.strip(), "\nConversation so far:"]
+    for turn in history[-6:]:
+        parts.append("User: %s" % turn["q"])
+        parts.append("Assistant: %s" % turn["a"])
+    parts.append("User: %s" % question)
+    parts.append("Assistant:")
+    return (generate("\n".join(parts), temperature=0.6) or "").strip()
 
 
 @practice_bp.route("/ask-ai", methods=["GET", "POST"])
