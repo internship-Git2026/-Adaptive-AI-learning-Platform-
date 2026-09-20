@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (openBtn && settingsContainer) {
     openBtn.addEventListener("click", () => {
-      fetch("/settings/")
+      showSettingsToast("Opening settings…");
+      fetch("/settings/", { cache: "no-store" })
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP Error: ${response.status}`);
@@ -16,17 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
           settingsContainer.innerHTML = html;
 
           const panel = document.getElementById("settingsPanel");
-          const closeBtn = document.getElementById("closeSettings");
-
-          if (panel) {
-            panel.classList.add("open");
+          if (!panel) {
+            // Most likely cause: session expired and the server returned
+            // the sign-in page instead of the panel. Never fail silently.
+            window.location.href = "/signin/";
+            return;
           }
+          hideSettingsToast();
+          panel.classList.add("open");
 
+          const closeBtn = document.getElementById("closeSettings");
           if (closeBtn) {
             closeBtn.addEventListener("click", () => {
-              if (panel) {
-                panel.classList.remove("open");
-              }
+              panel.classList.remove("open");
 
               setTimeout(() => {
                 settingsContainer.innerHTML = "";
@@ -36,8 +39,36 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch((error) => {
           console.error("Settings Error:", error);
+          showSettingsToast(
+            "Couldn't open settings. Check your connection and try again.",
+            true
+          );
         });
     });
+  }
+
+  function showSettingsToast(message, isError) {
+    hideSettingsToast();
+    const toast = document.createElement("div");
+    toast.id = "settingsToast";
+    toast.textContent = message;
+    toast.style.cssText =
+      "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);" +
+      "background:" + (isError ? "#dc2626" : "#0f172a") + ";color:#fff;" +
+      "padding:0.7rem 1.2rem;border-radius:12px;font-size:0.9rem;" +
+      "font-weight:600;z-index:10000;box-shadow:0 10px 25px rgba(0,0,0,.25);" +
+      "max-width:calc(100vw - 48px);text-align:center;";
+    document.body.appendChild(toast);
+    if (!isError) {
+      toast.dataset.transient = "1";
+    }
+  }
+
+  function hideSettingsToast() {
+    const existing = document.getElementById("settingsToast");
+    if (existing) {
+      existing.remove();
+    }
   }
 
   // ================= SIDEBAR =================
